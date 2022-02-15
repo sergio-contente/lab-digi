@@ -13,7 +13,7 @@ entity fluxo_dados is
   limpaR : in std_logic;
   contaTMR : in std_logic;
   zeraTMR : in std_logic;
-  escreve : in std_logic;
+  escreveM : in std_logic;
   chavesIgualMemoria : out std_logic;
   enderecoMenorOuIgualSequencia : out std_logic;
   enderecoIgualSequencia : out std_logic;
@@ -134,6 +134,7 @@ BEGIN
   not_registraM <= NOT registraM;
   s_chaveacionada <= '1' when chaves(0) = '1' or chaves(1) = '1' or 
                     chaves(2) = '1' or chaves(3) = '1' else '0';
+  not_chaveacionada <= not s_chaveacionada;
 	
   db_sequencia <= s_sequencia;					
   db_jogada <= s_jogada;
@@ -144,25 +145,25 @@ BEGIN
   ContEnd : contador_163
   PORT MAP(
     clock => clock, 
-	clr   => not_zeraE, 
-	ld    =>  '1', 
-	ent   => '1', 
-	enp   => contaE, 
-	D     => "0000", 
-	Q     => s_endereco, 
-	RCO   => fimE
+    clr   => not_zeraE, 
+    ld    =>  '1', 
+    ent   => '1', 
+    enp   => contaE, 
+    D     => "0000", 
+    Q     => s_endereco, 
+    RCO   => fimE
   );
 
   ContSeq : contador_163
   PORT MAP(
     clock => clock, 
-	clr   => not_zeraS, 
-	ld    =>  '1', 
-	ent   => '1', 
-	enp   => contaS, 
-	D     => "0000", 
-	Q     => s_sequencia, 
-	RCO   => fimS
+	  clr   => not_zeraS, 
+	  ld    =>  '1', 
+	  ent   => '1', 
+	  enp   => contaS, 
+	  D     => "0000", 
+	  Q     => s_sequencia, 
+	  RCO   => fimS
   );
 
   CompJog : comparador_85
@@ -233,7 +234,7 @@ BEGIN
   JGD: edge_detector
   PORT MAP(
     clock => clock,
-    reset => ,
+    reset => not_chaveacionada,
     sinal => s_chaveacionada,
     pulso => jogada_feita
   );
