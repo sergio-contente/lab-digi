@@ -25,7 +25,7 @@ entity unidade_controle is
 	zeraE : out std_logic;
 	zeraS : out std_logic;
 	zeraTMR : out std_logic;
-    db_estado : out std_logic_vector(4 downto 0)
+    db_estado : out std_logic_vector(3 downto 0)
     );
    end entity;
 
@@ -64,7 +64,7 @@ begin
     Eprox <=
         inicial                 when  Eatual=inicial and iniciar='0' else
         preparacao_jogo         when  Eatual=inicial and iniciar='1' else
-        preparacao_leds         when  Eatual=preparacao or Eatual=aumenta_endereco or Eatual=proxima_sequencia else
+        preparacao_leds         when  Eatual=preparacao_jogo or Eatual=aumenta_endereco_led or Eatual=proxima_sequencia else
         led_aceso               when  Eatual=preparacao_leds or (Eatual=led_aceso and fimTMR = '0') else
         reset_leds              when  Eatual=led_aceso and fimTMR = '1' else
         led_apagado             when  Eatual=reset_leds or (Eatual=led_apagado and fimTMR = '0') else
@@ -73,8 +73,8 @@ begin
         espera_jogada           when  Eatual=zera_endereco or (Eatual=espera_jogada and jogada = '0') else
         registra_jogada         when  Eatual=espera_jogada and jogada= '1' else
         compara_jogada          when  Eatual=registra_jogada else
-        fim_perdeu              when  (Eatual=comparacao and igual = '0') or (Eatual = fim_perdeu and iniciar = '0') else
-        fim_ganhou              when  (Eatual=comparacao and igual = '1' and fimS='1' and fimE='1') or (Eatual = fim_ganhou and iniciar = '0') else
+        fim_perdeu              when  (Eatual=compara_jogada and igualJ = '0') or (Eatual = fim_perdeu and iniciar = '0') else
+        fim_ganhou              when  (Eatual=compara_jogada and igualJ = '1' and fimS='1' and fimE='1') or (Eatual = fim_ganhou and iniciar = '0') else
         aumenta_endereco_jogada when Eatual=compara_jogada and fimS = '0' else
         proxima_sequencia       when  Eatual=compara_jogada and fimS = '1' and fimE = '0' else
         preparacao_leds         when  Eatual=proxima_sequencia else
@@ -128,20 +128,20 @@ begin
                       '1' when reset_leds,
                       '0' when others;
     with Eatual select
-        db_estado <=  "00000" when inicial,     -- 0
-                      "00001" when preparacao_jogo,  -- 1
-                      "00010" when preparacao_leds,    -- 2
-                      "00011" when led_aceso,  -- 3
-                      "00100" when reset_leds,     -- 4
-                      "00101" when led_apagado, -- 5
-                      "00110" when aumenta_endereco_led,   -- 6
-                      "00111" when zera_endereco;      -- 7
-                      "01000" when espera_jogada,     -- 8
-                      "01001" when registra_jogada,  -- 9
-                      "01010" when compara_jogada,    -- A
-                      "01011" when fim_perdeu,  -- B
-                      "01100" when fim_ganhou,     -- C
-                      "01101" when aumenta_endereco_jogada, -- D
-                      "01110" when proxima_sequencia,   -- E
-                      "01111" when others;      -- F
+        db_estado <=  "0000" when inicial,     -- 0
+                      "0001" when preparacao_jogo,  -- 1
+                      "0010" when preparacao_leds,    -- 2
+                      "0011" when led_aceso,  -- 3
+                      "0100" when reset_leds,     -- 4
+                      "0101" when led_apagado, -- 5
+                      "0110" when aumenta_endereco_led,   -- 6
+                      "0111" when zera_endereco,      -- 7
+                      "1000" when espera_jogada,     -- 8
+                      "1001" when registra_jogada,  -- 9
+                      "1010" when compara_jogada,    -- A
+                      "1011" when fim_perdeu,  -- B
+                      "1100" when fim_ganhou,     -- C
+                      "1101" when aumenta_endereco_jogada, -- D
+                      "1110" when proxima_sequencia,   -- E
+                      "1111" when others;      -- F
 end architecture;

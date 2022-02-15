@@ -15,12 +15,12 @@ ENTITY circuito_exp5 IS
 		db_tem_jogada : out std_logic;
 		db_chavesIgualMemoria : out std_logic;
 		db_enderecoIgualSequencia: out std_logic;
-		db_fimS : out std_logic
+		db_fimS : out std_logic;
 		db_contagem : out std_logic_vector (6 downto 0);
 		db_memoria : out std_logic_vector (6 downto 0);
 		db_estado : out std_logic_vector (6 downto 0);
 		db_jogadafeita : out std_logic_vector (6 downto 0);
-		db_sequencia : out std_logic_vector (6 downto 0);
+		db_sequencia : out std_logic_vector (6 downto 0)
 	);
 END ENTITY;
 
@@ -84,12 +84,13 @@ ARCHITECTURE arch_exp5 OF circuito_exp5 IS
 			zeraE : out std_logic;
 			zeraS : out std_logic;
 			zeraTMR : out std_logic;
-			db_estado : out std_logic_vector(4 downto 0)
+			db_estado : out std_logic_vector(3 downto 0)
 		);
 	END COMPONENT;
 
-	SIGNAL s_timeout, s_jogadafeita, s_temjogada, not_clock, fim, fimCM, zeraC, contaC, contaCM, zeraR, registraR, escreveM, s_igual : STD_LOGIC;
-	SIGNAL s_jogada, s_contagem, s_memoria, s_estado : STD_LOGIC_VECTOR (3 DOWNTO 0);
+	SIGNAL limpaM, igualS, igualJ, fimS, s_jogadafeita, s_temjogada, not_clock, fimE, zeraC, contaS, contaE, zeraR, zeraS, zeraE, registraR, contaTMR, zeraTMR, limpaR, fimTMR, escreveM, s_igualMemoria, s_igualSequencia, s_menorSequencia : STD_LOGIC;
+	SIGNAL s_jogada, s_contagem, s_memoria, s_sequencia, s_estado : STD_LOGIC_VECTOR (3 DOWNTO 0);
+
 BEGIN
 	HEXA0 : hexa7seg
 	PORT MAP(
@@ -120,7 +121,7 @@ BEGIN
 	db_enderecoIgualSequencia <= s_igualSequencia;
 	db_tem_jogada <= s_temjogada;
 	db_clock <= clock;
-	db_fimS <= s_fimS;
+	db_fimS <= fimS;
 
 	fd: fluxo_dados
 		PORT MAP(
@@ -135,14 +136,14 @@ BEGIN
 			contaTMR => contaTMR,
 			zeraTMR => zeraTMR,
 			escreveM => escreveM,
-			chavesIgualMemoria => chavesIgualMemoria,
-			enderecoMenorOuIgualSequencia => enderecoMenorOuIgualSequencia,
-			enderecoIgualSequencia => enderecoIgualSequencia,
+			chavesIgualMemoria => s_igualMemoria,
+			enderecoMenorOuIgualSequencia => s_menorSequencia,
+			enderecoIgualSequencia => s_igualSequencia,
 			fimS	=> fimS,
 			fimE  	=> fimE,
 			fimTMR 	=> fimTMR,
-			jogada_feita => jogada_feita,
-			db_tem_jogada => db_tem_jogada
+			jogada_feita => s_jogadafeita,
+			db_tem_jogada => s_temjogada,
 			db_contagem => s_contagem,
 			db_memoria => s_memoria,
 			db_jogada => s_jogada,
@@ -156,9 +157,9 @@ BEGIN
 			fimE => fimE,
 			fimS => fimS,
 			fimTMR => fimTMR,
-			igualJ => igualJ,
-			igualS => igualS,
-			jogada => jogada,
+			igualJ => s_igualMemoria,
+			igualS => s_igualSequencia,
+			jogada => s_temjogada,
 			contaE => contaE,
 			contaS => contaS,
 			contaTMR => contaTMR,
@@ -167,7 +168,7 @@ BEGIN
 			limpaR => limpaR,
 			perdeu => perdeu,
 			pronto => pronto,
-			registraM => registraM,
+			registraM => escreveM,
 			registraR => registraR,
 			zeraE => zeraE,
 			zeraS => zeraS,

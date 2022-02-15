@@ -1,5 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+use IEEE.MATH_REAL.ALL;
 
 entity fluxo_dados is
   port (
@@ -34,11 +35,14 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_not_escreve : STD_LOGIC;
+  SIGNAL not_zeraE : STD_LOGIC;
   SIGNAL s_jogada : STD_LOGIC_VECTOR (3 DOWNTO 0);
-  SIGNAL not_zeraC : STD_LOGIC;
+  SIGNAL not_zeraS : STD_LOGIC;
   SIGNAL s_dado : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL not_registraR, not_registraM : STD_LOGIC;
   SIGNAL s_chaveacionada: std_logic;
+  SIGNAL not_chaveacionada: std_logic;
+  SIGNAL limpaM: std_logic;
 
   COMPONENT hexa7seg
     PORT (
@@ -131,15 +135,14 @@ BEGIN
   not_zeraS <= NOT zeraS;
   s_not_escreve <= NOT escreveM;
   not_registraR <= NOT registraR;
-  not_registraM <= NOT registraM;
-  s_chaveacionada <= '1' when chaves(0) = '1' or chaves(1) = '1' or 
-                    chaves(2) = '1' or chaves(3) = '1' else '0';
+  not_registraM <= NOT escreveM;
+  s_chaveacionada <= '1' when botoes(0) = '1' or botoes(1) = '1' or 
+                    botoes(2) = '1' or botoes(3) = '1' else '0';
   not_chaveacionada <= not s_chaveacionada;
 	
   db_sequencia <= s_sequencia;					
   db_jogada <= s_jogada;
   db_contagem <= s_endereco;
-  db_memoria <= s_dado;
   db_tem_jogada <= s_chaveacionada;
 
   ContEnd : contador_163
@@ -176,7 +179,7 @@ BEGIN
     i_B1 => s_endereco(1),
     i_A0 => s_sequencia(0),
     i_B0 => s_endereco(0),
-    i_AGTB => '0',
+    i_AGTB => '1',
     i_ALTB => '0',
     i_AEQB => '1',
     o_AGTB => enderecoMenorOuIgualSequencia,
@@ -187,19 +190,19 @@ BEGIN
   CompSeq : comparador_85
   PORT MAP(
     i_A3 => s_dado(3),
-    i_B3 => s_chaves(3),
+    i_B3 => s_jogada(3),
     i_A2 => s_dado(2),
-    i_B2 => s_chaves(2),
+    i_B2 => s_jogada(2),
     i_A1 => s_dado(1),
-    i_B1 => s_chaves(1),
+    i_B1 => s_jogada(1),
     i_A0 => s_dado(0),
-    i_B0 => s_chaves(0),
+    i_B0 => s_jogada(0),
     i_AGTB => '0',
     i_ALTB => '0',
     i_AEQB => '1',
     o_AGTB => OPEN,
     o_ALTB => OPEN,
-    o_AEQB => igual
+    o_AEQB => chavesIgualMemoria
   );
 
   RegBotoes : registrador_173
@@ -226,7 +229,7 @@ BEGIN
   PORT MAP(
     clk => clock,
     endereco => s_endereco,
-    dado_entrada => s_chaves,
+    dado_entrada => s_jogada,
     we => s_not_escreve, -- we ativo baixo
     ce => '0',
     dado_saida => s_dado
@@ -243,7 +246,7 @@ BEGIN
   PORT MAP(
 		clock   => clock,
         zera_as => zeraTMR,
-        zera_s  => open;
+        zera_s  => '0',
         conta   => contaTMR,
         Q       => open,
         fim     => fimTMR,
