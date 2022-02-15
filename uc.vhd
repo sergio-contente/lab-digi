@@ -93,6 +93,7 @@ begin
                       '0' when others;
     with Eatual select
 	    contaTMR <=   '1' when led_aceso,
+                      '1' when led_apagado,
                       '0' when others;
     with Eatual select
         ganhou <=     '1' when fim_ganhou,

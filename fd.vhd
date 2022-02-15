@@ -12,6 +12,7 @@ entity fluxo_dados is
   registraR : in std_logic;
   botoes : in std_logic_vector (3 downto 0);
   limpaR : in std_logic;
+  limpaM : in std_logic;
   contaTMR : in std_logic;
   zeraTMR : in std_logic;
   escreveM : in std_logic;
@@ -42,7 +43,6 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL not_registraR, not_registraM : STD_LOGIC;
   SIGNAL s_chaveacionada: std_logic;
   SIGNAL not_chaveacionada: std_logic;
-  SIGNAL limpaM: std_logic;
 
   COMPONENT hexa7seg
     PORT (

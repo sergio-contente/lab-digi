@@ -26,30 +26,31 @@ END ENTITY;
 
 ARCHITECTURE arch_exp5 OF circuito_exp5 IS
 	COMPONENT fluxo_dados IS
-		PORT (
-			clock : in std_logic;
-			contaS : in std_logic;
-			zeraS : in std_logic;
-			contaE : in std_logic;
-			zeraE : in std_logic;
-			registraR : in std_logic;
-			botoes : in std_logic_vector (3 downto 0);
-			limpaR : in std_logic;
-			contaTMR : in std_logic;
-			zeraTMR : in std_logic;
-			escreveM : in std_logic;
-			chavesIgualMemoria : out std_logic;
-			enderecoMenorOuIgualSequencia : out std_logic;
-			enderecoIgualSequencia : out std_logic;
-			fimS	: out std_logic;
-			fimE  : out std_logic;
-			fimTMR : out std_logic;
-			jogada_feita : out std_logic;
-			db_tem_jogada : out std_logic;
-			db_contagem : out std_logic_vector (3 downto 0);
-			db_memoria : out std_logic_vector (3 downto 0);
-			db_jogada : out std_logic_vector (3 downto 0);
-			db_sequencia: out std_logic_vector (3 downto 0)
+	port (
+		clock : in std_logic;
+		contaS : in std_logic;
+		zeraS : in std_logic;
+		contaE : in std_logic;
+		zeraE : in std_logic;
+		registraR : in std_logic;
+		botoes : in std_logic_vector (3 downto 0);
+		limpaR : in std_logic;
+		limpaM : in std_logic;
+		contaTMR : in std_logic;
+		zeraTMR : in std_logic;
+		escreveM : in std_logic;
+		chavesIgualMemoria : out std_logic;
+		enderecoMenorOuIgualSequencia : out std_logic;
+		enderecoIgualSequencia : out std_logic;
+		fimS	: out std_logic;
+		fimE  : out std_logic;
+		fimTMR : out std_logic;
+		jogada_feita : out std_logic;
+		db_tem_jogada : out std_logic;
+		db_contagem : out std_logic_vector (3 downto 0);
+		db_memoria : out std_logic_vector (3 downto 0);
+		db_jogada : out std_logic_vector (3 downto 0);
+		db_sequencia: out std_logic_vector (3 downto 0)
 		);
 	END COMPONENT;
 
@@ -122,6 +123,7 @@ BEGIN
 	db_tem_jogada <= s_temjogada;
 	db_clock <= clock;
 	db_fimS <= fimS;
+	leds <= s_memoria;
 
 	fd: fluxo_dados
 		PORT MAP(
@@ -133,6 +135,7 @@ BEGIN
 			registraR => registraR,
 			botoes => botoes,
 			limpaR => limpaR,
+			limpaM => limpaM,
 			contaTMR => contaTMR,
 			zeraTMR => zeraTMR,
 			escreveM => escreveM,
@@ -159,7 +162,7 @@ BEGIN
 			fimTMR => fimTMR,
 			igualJ => s_igualMemoria,
 			igualS => s_igualSequencia,
-			jogada => s_temjogada,
+			jogada => s_jogadafeita,
 			contaE => contaE,
 			contaS => contaS,
 			contaTMR => contaTMR,
