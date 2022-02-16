@@ -35,7 +35,6 @@ ARCHITECTURE estrutural OF fluxo_dados IS
 
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
-  SIGNAL s_not_escreve : STD_LOGIC;
   SIGNAL not_zeraE : STD_LOGIC;
   SIGNAL s_jogada : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL not_zeraS : STD_LOGIC;
@@ -133,7 +132,6 @@ BEGIN
 
   not_zeraE <= NOT zeraE;
   not_zeraS <= NOT zeraS;
-  s_not_escreve <= NOT escreveM;
   not_registraR <= NOT registraR;
   not_registraM <= NOT escreveM;
   s_chaveacionada <= '1' when botoes(0) = '1' or botoes(1) = '1' or 
@@ -224,8 +222,8 @@ BEGIN
     D => s_dado,
     Q => db_memoria
   );
-  -- memoria: ram_16x4  -- usar para Quartus
-  memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
+  memoria: ram_16x4  -- usar para Quartus
+  --memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
   PORT MAP(
     clk => clock,
     endereco => s_endereco,
