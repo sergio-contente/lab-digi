@@ -224,13 +224,13 @@ BEGIN
     D => s_dado,
     Q => db_memoria
   );
-
-  memJog : ram_16x4 -- usar para Quartus
+  -- memoria: ram_16x4  -- usar para Quartus
+  memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
   PORT MAP(
     clk => clock,
     endereco => s_endereco,
     dado_entrada => s_jogada,
-    we => s_not_escreve, -- we ativo baixo
+    we => '1', -- we ativo baixo
     ce => '0',
     dado_saida => s_dado
   );
