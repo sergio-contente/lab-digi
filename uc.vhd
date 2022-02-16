@@ -68,19 +68,16 @@ begin
         led_aceso               when  Eatual=preparacao_leds or (Eatual=led_aceso and fimTMR = '0') else
         reset_leds              when  Eatual=led_aceso and fimTMR = '1' else
         led_apagado             when  Eatual=reset_leds or (Eatual=led_apagado and fimTMR = '0') else
-        aumenta_endereco_led    when  Eatual=led_apagado and fimS='0' and fimTMR='1' else
-        zera_endereco           when  Eatual=led_apagado and fimS='1' and fimTMR='1' else
-        espera_jogada           when  Eatual=zera_endereco or (Eatual=espera_jogada and jogada = '0') else
+        aumenta_endereco_led    when  Eatual=led_apagado and igualS='0' and fimTMR='1' else
+        zera_endereco           when  Eatual=led_apagado and igualS='1' and fimTMR='1' else
+        espera_jogada           when  Eatual=zera_endereco or (Eatual=espera_jogada and jogada = '0') or Eatual=aumenta_endereco_jogada else
         registra_jogada         when  Eatual=espera_jogada and jogada= '1' else
         compara_jogada          when  Eatual=registra_jogada else
         fim_perdeu              when  (Eatual=compara_jogada and igualJ = '0') or (Eatual = fim_perdeu and iniciar = '0') else
         fim_ganhou              when  (Eatual=compara_jogada and igualJ = '1' and fimS='1' and fimE='1') or (Eatual = fim_ganhou and iniciar = '0') else
-        aumenta_endereco_jogada when Eatual=compara_jogada and fimS = '0' else
-        proxima_sequencia       when  Eatual=compara_jogada and fimS = '1' and fimE = '0' else
-        preparacao_leds         when  Eatual=proxima_sequencia else
-        espera_jogada           when Eatual=aumenta_endereco_jogada else
-        inicial                 when  Eatual=fim_perdeu and iniciar = '1' else
-        inicial                 when  Eatual=fim_ganhou and iniciar = '1' else
+        aumenta_endereco_jogada when Eatual=compara_jogada and igualS = '0' else
+        proxima_sequencia       when  Eatual=compara_jogada and igualS = '1' and fimS = '0' else
+        inicial                 when  (Eatual=fim_perdeu or Eatual=fim_ganhou) and iniciar = '1' else
         inicial;
 
     -- logica de saída (maquina de Moore)
