@@ -117,6 +117,7 @@ begin
                       '0' when others;
     with Eatual select
 	    zeraE <=      '1' when zera_endereco,
+                      '1' when proxima_sequencia,
                       '0' when others;
     with Eatual select
 	    zeraS <=      '1' when preparacao_jogo,
