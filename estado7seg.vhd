@@ -32,13 +32,13 @@ architecture comportamental of estado7seg is
 begin
 
   sseg <= "1000000" when estado="00000" else  -- 0
-          "1111001" when estado="00001" else  -- 1
+          "0000110" when estado="00001" else  -- 1
           "0100100" when estado="00010" else  -- 2
-          "0110000" when estado="00011" else  -- 3
-          "0011001" when estado="00100" else  -- 4
-          "0010010" when estado="00101" else  -- 5
-          "0000010" when estado="00110" else  -- 6
-          "1111000" when estado="00111" else  -- 7
+          "1111001" when estado="00011" else  -- 3
+          "0110011" when estado="00100" else  -- 4
+          "1011011" when estado="00101" else  -- 5
+          "1011111" when estado="00110" else  -- 6
+          "1110000" when estado="00111" else  -- 7
           "0000000" when estado="01000" else  -- 8
           "0010000" when estado="01001" else  -- 9
           "0001000" when estado="01010" else  -- A

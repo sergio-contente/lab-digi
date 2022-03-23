@@ -24,19 +24,19 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity ram_16x4 is
+entity ram_25x16 is
    port (       
        clk          : in  std_logic;
-       endereco     : in  std_logic_vector(3 downto 0);
-       dado_entrada : in  std_logic_vector(3 downto 0);
+       endereco     : in  std_logic_vector(15 downto 0);
+       dado_entrada : in  std_logic_vector(24 downto 0);
        we           : in  std_logic;
        ce           : in  std_logic;
-       dado_saida   : out std_logic_vector(3 downto 0)
+       dado_saida   : out std_logic_vector(24 downto 0)
     );
-end entity ram_16x4;
+end entity ram_25x16;
 
-architecture ram_mif of ram_16x4 is
-  type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0);
+architecture ram_mif of ram_25x16 is
+  type   arranjo_memoria is array(0 to 15) of std_logic_vector(24 downto 0);
   signal memoria : arranjo_memoria;
   
   -- Configuracao do Arquivo MIF
@@ -64,44 +64,44 @@ begin
   
 end architecture ram_mif;
 
--- Dados iniciais (para simulacao com Modelsim) 
-architecture ram_modelsim of ram_16x4 is
-  type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0);
-  signal memoria : arranjo_memoria := (
-                                        "0001",
-                                        "0010",
-                                        "0100",
-                                        "1000",
-                                        "0100",
-                                        "0010",
-                                        "0001",
-                                        "0001",
-                                        "0010",
-                                        "0010",
-                                        "0100",
-                                        "0100",
-                                        "1000",
-                                        "1000",
-                                        "0001",
-                                        "0100" );
+-- -- Dados iniciais (para simulacao com Modelsim) 
+-- architecture ram_modelsim of ram_16x4 is
+--   type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0);
+--   signal memoria : arranjo_memoria := (
+--                                         "0001",
+--                                         "0010",
+--                                         "0100",
+--                                         "1000",
+--                                         "0100",
+--                                         "0010",
+--                                         "0001",
+--                                         "0001",
+--                                         "0010",
+--                                         "0010",
+--                                         "0100",
+--                                         "0100",
+--                                         "1000",
+--                                         "1000",
+--                                         "0001",
+--                                         "0100" );
   
-begin
+-- begin
 
-  process(clk)
-  begin
-    if (clk = '1' and clk'event) then
-          if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
+--   process(clk)
+--   begin
+--     if (clk = '1' and clk'event) then
+--           if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
            
-              -- Detecta ativacao de we (ativo baixo)
-              if (we = '0') 
-                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
-              end if;
+--               -- Detecta ativacao de we (ativo baixo)
+--               if (we = '0') 
+--                   then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
+--               end if;
             
-          end if;
-      end if;
-  end process;
+--           end if;
+--       end if;
+--   end process;
 
-  -- saida da memoria
-  dado_saida <= memoria(to_integer(unsigned(endereco)));
+--   -- saida da memoria
+--   dado_saida <= memoria(to_integer(unsigned(endereco)));
 
-end architecture ram_modelsim;
+-- end architecture ram_modelsim;

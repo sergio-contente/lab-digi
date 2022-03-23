@@ -12,6 +12,7 @@ entity fluxo_dados is
   ganhou : in std_logic;
   perdeu : in std_logic;
   pronto : in std_logic;
+  
   fim_tentativas : out std_logic;
 	tem_jogada : out std_logic;
 	jogada_igual_senha : out std_logic;
@@ -29,6 +30,11 @@ entity fluxo_dados is
 
 ARCHITECTURE estrutural OF fluxo_dados IS
 
+  type vector5 is array (natural range <>) of std_logic_vector(4 downto 0);
+  signal vec_jogadas : vector5(24 downto 0);
+  signal vec_senhas : vector5(24 downto 0);
+  signal vec_saidas : std_logic_vector(24 downto 0);
+
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL not_zeraE : STD_LOGIC;
@@ -39,23 +45,24 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_chaveacionada: std_logic;
   SIGNAL not_chaveacionada: std_logic;
 
-  COMPONENT hexa7seg
-    PORT (
-      hexa : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-      sseg : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+  component alfabeto7seg is
+    port (
+        letra : in  std_logic_vector(4 downto 0);
+        sseg   : out std_logic_vector(6 downto 0)
     );
-  END COMPONENT;
+  end component;
 
-  COMPONENT registrador_173 IS
-    PORT (
-      clock : IN STD_LOGIC;
-      clear : IN STD_LOGIC;
-      en1 : IN STD_LOGIC;
-      en2 : IN STD_LOGIC;
-      D : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
-      Q : OUT STD_LOGIC_VECTOR (3 DOWNTO 0)
-    );
-  END COMPONENT;
+  component registrador_25 is
+    port (
+        clock : in  std_logic;
+        clear : in  std_logic;
+        en1   : in  std_logic;
+        en2   : in  std_logic;
+        D     : in  std_logic_vector (24 downto 0);
+        Q     : out std_logic_vector (24 downto 0)
+   );
+  end component;
+
 
   COMPONENT contador_163
     PORT (
@@ -70,35 +77,18 @@ ARCHITECTURE estrutural OF fluxo_dados IS
     );
   END COMPONENT;
 
-  COMPONENT comparador_85
-    PORT (
-      i_A3 : IN STD_LOGIC;
-      i_B3 : IN STD_LOGIC;
-      i_A2 : IN STD_LOGIC;
-      i_B2 : IN STD_LOGIC;
-      i_A1 : IN STD_LOGIC;
-      i_B1 : IN STD_LOGIC;
-      i_A0 : IN STD_LOGIC;
-      i_B0 : IN STD_LOGIC;
-      i_AGTB : IN STD_LOGIC;
-      i_ALTB : IN STD_LOGIC;
-      i_AEQB : IN STD_LOGIC;
-      o_AGTB : OUT STD_LOGIC;
-      o_ALTB : OUT STD_LOGIC;
-      o_AEQB : OUT STD_LOGIC
-    );
-  END COMPONENT;
-
-  COMPONENT ram_16x4 IS
-    PORT (
-      clk : IN STD_LOGIC;
-      endereco : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-      dado_entrada : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-      we : IN STD_LOGIC;
-      ce : IN STD_LOGIC;
-      dado_saida : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
-    );
-  END COMPONENT;
+  component contador_6 is
+    port (
+        clock : in  std_logic;
+        clr   : in  std_logic;
+        ld    : in  std_logic;
+        ent   : in  std_logic;
+        enp   : in  std_logic;
+        D     : in  std_logic_vector (2 downto 0);
+        Q     : out std_logic_vector (2 downto 0);
+        rco   : out std_logic 
+   );
+  end component;
 
   component edge_detector is
     port (
@@ -124,7 +114,45 @@ ARCHITECTURE estrutural OF fluxo_dados IS
     );
 end component;
 
+component comparador_igualdade is
+  port (
+    jogada_in : in std_logic_vector(4 downto 0);
+    senha_in : in std_logic_vector(4 downto 0);
+    o_AEQB : out std_logic
+  );
+end component;
+
 BEGIN
+
+  -- regs: for n in 25 downto 5 generate
+  --   --n = 25
+  --   comparadores: comparador_igualdade port map(
+  --     i_A4   => s_dado(n-1)
+  --     i_B4   => s_memoria(n-1)
+  --     i_A3   => s_dado(n-2)
+  --     i_B3   => s_memoria(n-2)
+  --     i_A2   => s_dado(n-3)
+  --     i_B2   => s_memoria(n-3)
+  --     i_A1   => s_dado(n-4)
+  --     i_B1   => s_memoria(n-4)
+  --     i_A0   => s_dado(n-5)
+  --     i_B0   => s_memoria(n-5)
+  --     -- i_AEQB : in  std_logic;
+  --     o_AEQB => igual(n/5)
+  --   );
+  -- end generate;
+  
+  regs: for i in 0 to 24 generate
+    --n = 25
+    comparadores: comparador_igualdade port map(
+      jogada_in => vec_jogadas(i)
+      senha_in => vec_senhas(i)
+      -- i_AEQB : in  std_logic;
+      o_AEQB => vec_saidas(i)
+    );
+  end generate;
+
+  
 
   not_zeraE <= NOT zeraE;
   not_zeraS <= NOT zeraS;
@@ -199,26 +227,69 @@ BEGIN
     o_AEQB => chavesIgualMemoria
   );
 
-  RegBotoes : registrador_173
-  PORT MAP(
-    clock => clock,
-    clear => limpaR,
-    en1 => not_registraR,
-    en2 => not_registraR,
-    D => botoes,
-    Q => s_jogada
-  );
-
-  RegMem : registrador_173
+  reg_ultima_jogada : registrador_25
   PORT MAP(
     clock => clock,
     clear => limpaM,
     en1 => not_registraM,
     en2 => not_registraM,
-    D => s_dado,
-    Q => db_memoria
+    D => entrada_jogador,
+    Q => s_jogada
   );
-  memoria: ram_16x4  -- usar para Quartus
+
+  s_jogada(0 to 4) => vec_jogadas(0);
+  s_jogada(0 to 4) => vec_jogadas(1);
+  s_jogada(0 to 4) => vec_jogadas(2);
+  s_jogada(0 to 4) => vec_jogadas(3);
+  s_jogada(0 to 4) => vec_jogadas(4);
+  s_jogada(5 to 9) => vec_jogadas(5);
+  s_jogada(5 to 9) => vec_jogadas(6);
+  s_jogada(5 to 9) => vec_jogadas(7);
+  s_jogada(5 to 9) => vec_jogadas(8);
+  s_jogada(5 to 9) => vec_jogadas(9);
+  s_jogada(10 to 14) => vec_jogadas(10);
+  s_jogada(10 to 14) => vec_jogadas(11);
+  s_jogada(10 to 14) => vec_jogadas(12);
+  s_jogada(10 to 14) => vec_jogadas(13);
+  s_jogada(10 to 14) => vec_jogadas(14);
+  s_jogada(15 to 19) => vec_jogadas(15);
+  s_jogada(15 to 19) => vec_jogadas(16);
+  s_jogada(15 to 19) => vec_jogadas(17);
+  s_jogada(15 to 19) => vec_jogadas(18);
+  s_jogada(15 to 19) => vec_jogadas(19);
+  s_jogada(20 to 24) => vec_jogadas(20);
+  s_jogada(20 to 24) => vec_jogadas(21);
+  s_jogada(20 to 24) => vec_jogadas(22);
+  s_jogada(20 to 24) => vec_jogadas(23);
+  s_jogada(20 to 24) => vec_jogadas(24);
+
+  s_senha(0 to 4) => vec_senhas(0);
+  s_senha(5 to 9) => vec_senhas(1);
+  s_senha(10 to 14) => vec_senhas(2);
+  s_senha(15 to 19) => vec_senhas(3);
+  s_senha(20 to 24) => vec_senhas(4);
+  s_senha(0 to 4) => vec_senhas(5);
+  s_senha(5 to 9) => vec_senhas(6);
+  s_senha(10 to 14) => vec_senhas(7);
+  s_senha(15 to 19) => vec_senhas(8);
+  s_senha(20 to 24) => vec_senhas(9);
+  s_senha(0 to 4) => vec_senhas(10);
+  s_senha(5 to 9) => vec_senhas(11);
+  s_senha(10 to 14) => vec_senhas(12);
+  s_senha(15 to 19) => vec_senhas(13);
+  s_senha(20 to 24) => vec_senhas(14);
+  s_senha(0 to 4) => vec_senhas(15);
+  s_senha(5 to 9) => vec_senhas(16);
+  s_senha(10 to 14) => vec_senhas(17);
+  s_senha(15 to 19) => vec_senhas(18);
+  s_senha(20 to 24) => vec_senhas(19);
+  s_senha(0 to 4) => vec_senhas(20);
+  s_senha(5 to 9) => vec_senhas(21);
+  s_senha(10 to 14) => vec_senhas(22);
+  s_senha(15 to 19) => vec_senhas(23);
+  s_senha(20 to 24) => vec_senhas(24);
+  
+  memoria: ram_16x25  -- usar para Quartus
   --memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
   PORT MAP(
     clk => clock,
@@ -226,7 +297,7 @@ BEGIN
     dado_entrada => s_jogada,
     we => '1', -- we ativo baixo
     ce => '0',
-    dado_saida => s_dado
+    dado_saida => s_senha
   );
   JGD: edge_detector
   PORT MAP(
