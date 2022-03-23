@@ -5,29 +5,25 @@ use IEEE.MATH_REAL.ALL;
 entity fluxo_dados is
   port (
   clock : in std_logic;
-  contaS : in std_logic;
-  zeraS : in std_logic;
-  contaE : in std_logic;
-  zeraE : in std_logic;
-  registraR : in std_logic;
-  botoes : in std_logic_vector (3 downto 0);
-  limpaR : in std_logic;
-  limpaM : in std_logic;
-  contaTMR : in std_logic;
-  zeraTMR : in std_logic;
-  escreveM : in std_logic;
-  chavesIgualMemoria : out std_logic;
-  enderecoMenorOuIgualSequencia : out std_logic;
-  enderecoIgualSequencia : out std_logic;
-  fimS	: out std_logic;
-  fimE  : out std_logic;
-  fimTMR : out std_logic;
-  jogada_feita : out std_logic;
+  reset : in std_logic;
+  reset_timer : in std_logic;
+	enable_timer : in std_logic;
+	reset_contagem : in std_logic;
+  ganhou : in std_logic;
+  perdeu : in std_logic;
+  pronto : in std_logic;
+  fim_tentativas : out std_logic;
+	tem_jogada : out std_logic;
+	jogada_igual_senha : out std_logic;
+	contagem_igual_tentativa : out std_logic;
+  atualiza_resultado : in std_logic;
+  incrementa_contagem : in std_logic;
+  incrementa_partida : in std_logic;
   db_tem_jogada : out std_logic;
   db_contagem : out std_logic_vector (3 downto 0);
-  db_memoria : out std_logic_vector (3 downto 0);
+  db_senha : out std_logic_vector (3 downto 0);
   db_jogada : out std_logic_vector (3 downto 0);
-  db_sequencia: out std_logic_vector (3 downto 0)
+  db_partida : out std_logic_vector (3 downto 0)
   );
  end entity;
 
