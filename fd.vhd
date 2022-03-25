@@ -12,16 +12,14 @@ entity fluxo_dados is
   ganhou : in std_logic;
   perdeu : in std_logic;
   pronto : in std_logic;
-  
   fim_tentativas : out std_logic;
 	tem_jogada : out std_logic;
 	jogada_igual_senha : out std_logic;
-	contagem_igual_tentativa : out std_logic;
   atualiza_resultado : in std_logic;
   incrementa_contagem : in std_logic;
   incrementa_partida : in std_logic;
   db_tem_jogada : out std_logic;
-  db_contagem : out std_logic_vector (3 downto 0);
+  db_contagem : out std_logic_vector (2 downto 0);
   db_senha : out std_logic_vector (3 downto 0);
   db_jogada : out std_logic_vector (3 downto 0);
   db_partida : out std_logic_vector (3 downto 0)
@@ -31,6 +29,7 @@ entity fluxo_dados is
 ARCHITECTURE estrutural OF fluxo_dados IS
 
   type vector5 is array (natural range <>) of std_logic_vector(4 downto 0);
+
   signal vec_jogadas : vector5(24 downto 0);
   signal vec_senhas : vector5(24 downto 0);
   signal vec_saidas : std_logic_vector(24 downto 0);
@@ -38,6 +37,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL not_zeraE : STD_LOGIC;
+  SIGNAL s_contagem : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL s_jogada : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL not_zeraS : STD_LOGIC;
   SIGNAL s_dado : STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -62,7 +62,6 @@ ARCHITECTURE estrutural OF fluxo_dados IS
         Q     : out std_logic_vector (24 downto 0)
    );
   end component;
-
 
   COMPONENT contador_163
     PORT (
@@ -164,67 +163,19 @@ BEGIN
 	
   db_sequencia <= s_sequencia;					
   db_jogada <= s_jogada;
-  db_contagem <= s_endereco;
+  db_contagem <= s_contagem;
   db_tem_jogada <= s_chaveacionada;
 
-  ContEnd : contador_163
+  conta_partidas : contador_163
   PORT MAP(
     clock => clock, 
-    clr   => not_zeraE, 
-    ld    =>  '1', 
+    clr   => reset, 
+    ld    => '1', 
     ent   => '1', 
-    enp   => contaE, 
-    D     => "0000", 
+    enp   => incrementa_partida, 
+    D     => "0000",
     Q     => s_endereco, 
-    RCO   => fimE
-  );
-
-  ContSeq : contador_163
-  PORT MAP(
-    clock => clock, 
-	  clr   => not_zeraS, 
-	  ld    =>  '1', 
-	  ent   => '1', 
-	  enp   => contaS, 
-	  D     => "0000", 
-	  Q     => s_sequencia, 
-	  RCO   => fimS
-  );
-
-  CompJog : comparador_85
-  PORT MAP(
-    i_A3 => s_sequencia(3),
-    i_B3 => s_endereco(3),
-    i_A2 => s_sequencia(2),
-    i_B2 => s_endereco(2),
-    i_A1 => s_sequencia(1),
-    i_B1 => s_endereco(1),
-    i_A0 => s_sequencia(0),
-    i_B0 => s_endereco(0),
-    i_AGTB => '1',
-    i_ALTB => '0',
-    i_AEQB => '1',
-    o_AGTB => enderecoMenorOuIgualSequencia,
-    o_ALTB => OPEN,
-    o_AEQB => enderecoIgualSequencia
-  );
-
-  CompSeq : comparador_85
-  PORT MAP(
-    i_A3 => s_dado(3),
-    i_B3 => s_jogada(3),
-    i_A2 => s_dado(2),
-    i_B2 => s_jogada(2),
-    i_A1 => s_dado(1),
-    i_B1 => s_jogada(1),
-    i_A0 => s_dado(0),
-    i_B0 => s_jogada(0),
-    i_AGTB => '0',
-    i_ALTB => '0',
-    i_AEQB => '1',
-    o_AGTB => OPEN,
-    o_ALTB => OPEN,
-    o_AEQB => chavesIgualMemoria
+    RCO   => open
   );
 
   reg_ultima_jogada : registrador_25
@@ -294,27 +245,43 @@ BEGIN
   PORT MAP(
     clk => clock,
     endereco => s_endereco,
-    dado_entrada => s_jogada,
+    dado_entrada => open,
     we => '1', -- we ativo baixo
     ce => '0',
     dado_saida => s_senha
   );
-  JGD: edge_detector
-  PORT MAP(
-    clock => clock,
-    reset => not_chaveacionada,
-    sinal => s_chaveacionada,
-    pulso => jogada_feita
-  );
+
+  -- JGD: edge_detector
+  -- PORT MAP(
+  --   clock => clock,
+  --   reset => not_chaveacionada,
+  --   sinal => s_chaveacionada,
+  --   pulso => jogada_feita
+  -- );
   
   timer: contador_m
   PORT MAP(
 		clock   => clock,
-        zera_as => zeraTMR,
-        zera_s  => '0',
-        conta   => contaTMR,
-        Q       => open,
-        fim     => fimTMR,
-        meio    => open
+    zera_as => zeraTMR,
+    zera_s  => '0',
+    conta   => contaTMR,
+    Q       => open,
+    fim     => fimTMR,
+    meio    => open
   );
+
+  conta_jogada: contador_6
+  PORT MAP(
+    clock => clock,
+    clr   => reset_contagem,
+    ld    => '1',
+    ent   => '1',
+    enp   => incrementa_contagem,
+    D     => open,
+    Q     => s_contagem,
+    rco   => fim_tentativas
+  );
+
+  
+
 END estrutural;

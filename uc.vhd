@@ -9,7 +9,6 @@ entity unidade_controle is
 	fim_tentativas : in std_logic;
 	tem_jogada : in std_logic;
 	jogada_igual_senha : in std_logic;
-	contagem_igual_tentativa : in std_logic;
     reset_timer : out std_logic;
 	enable_timer : out std_logic;
 	reset_contagem : out std_logic;
