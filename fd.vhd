@@ -9,6 +9,7 @@ entity fluxo_dados is
   reset_timer : in std_logic;
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
+  jogada:  in std_logic (24 downto 0);
   ganhou : in std_logic;
   perdeu : in std_logic;
   pronto : in std_logic;
@@ -20,8 +21,8 @@ entity fluxo_dados is
   incrementa_partida : in std_logic;
   db_tem_jogada : out std_logic;
   db_contagem : out std_logic_vector (2 downto 0);
-  db_senha : out std_logic_vector (3 downto 0);
-  db_jogada : out std_logic_vector (3 downto 0);
+  db_senha : out std_logic_vector (4 downto 0);
+  db_jogada : out std_logic_vector (4 downto 0);
   db_partida : out std_logic_vector (3 downto 0)
   );
  end entity;
