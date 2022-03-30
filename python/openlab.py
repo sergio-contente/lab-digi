@@ -12,6 +12,8 @@ Broker = "labdigi.wiseful.com.br"
 Port = 80                           
 KeepAlive = 60                      
 
+tem_jogada = "0"
+
 palavra = ""
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
@@ -66,8 +68,13 @@ palavra_ant = palavra
 
 time.sleep(1)
 while True:
-  if palavra_ant != palavra: 
+  if palavra_ant != palavra:
+    tem_jogada = "1"
     publish_word(palavra)
+    time.sleep(1)
+  else:
+    tem_jogada = "0"
+  client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
 
 client.loop_stop()
 
