@@ -10,20 +10,23 @@ entity fluxo_dados is
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
   jogada:  in std_logic (24 downto 0);
-  ganhou : in std_logic;
-  perdeu : in std_logic;
-  pronto : in std_logic;
+  --ganhou : in std_logic;
+  --perdeu : in std_logic;
+  --pronto : in std_logic;
   fim_tentativas : out std_logic;
-	tem_jogada : out std_logic;
 	jogada_igual_senha : out std_logic;
-  atualiza_resultado : in std_logic;
+  --atualiza_resultado : in std_logic;
   incrementa_contagem : in std_logic;
   incrementa_partida : in std_logic;
+  clr_jogada : in std_logic;
+  en_reg_jogada : in std_logic;
+  tempo_jogada : out unsigned;
+  timeout : out std_logic;
   db_tem_jogada : out std_logic;
   db_contagem : out std_logic_vector (2 downto 0);
   db_senha : out std_logic_vector (4 downto 0);
   db_jogada : out std_logic_vector (4 downto 0);
-  db_partida : out std_logic_vector (3 downto 0)
+  db_partida : out std_logic_vector (2 downto 0)
   );
  end entity;
 
@@ -150,22 +153,23 @@ BEGIN
       -- i_AEQB : in  std_logic;
       o_AEQB => vec_saidas(i)
     );
-  end generate;
+  end generate;  
 
-  
-
-  not_zeraE <= NOT zeraE;
-  not_zeraS <= NOT zeraS;
-  not_registraR <= NOT registraR;
-  not_registraM <= NOT escreveM;
-  s_chaveacionada <= '1' when botoes(0) = '1' or botoes(1) = '1' or 
-                    botoes(2) = '1' or botoes(3) = '1' else '0';
-  not_chaveacionada <= not s_chaveacionada;
+  -- not_zeraE <= NOT zeraE;
+  -- not_zeraS <= NOT zeraS;
+  -- not_registraR <= NOT registraR;
+  -- not_registraM <= NOT escreveM;
+  -- s_chaveacionada <= '1' when botoes(0) = '1' or botoes(1) = '1' or 
+  --                   botoes(2) = '1' or botoes(3) = '1' else '0';
+  -- not_chaveacionada <= not s_chaveacionada;
 	
   db_sequencia <= s_sequencia;					
   db_jogada <= s_jogada;
   db_contagem <= s_contagem;
   db_tem_jogada <= s_chaveacionada;
+
+  jogada_igual_senha <= '1' when "1111111111111111111111111",
+                     <= '0' when others;
 
   conta_partidas : contador_163
   PORT MAP(
@@ -182,10 +186,10 @@ BEGIN
   reg_ultima_jogada : registrador_25
   PORT MAP(
     clock => clock,
-    clear => limpaM,
-    en1 => not_registraM,
-    en2 => not_registraM,
-    D => entrada_jogador,
+    clear => clr_jogada,
+    en1 => en_reg_jogada,
+    en2 => en_reg_jogada,
+    D => jogada,
     Q => s_jogada
   );
 
@@ -251,23 +255,15 @@ BEGIN
     ce => '0',
     dado_saida => s_senha
   );
-
-  -- JGD: edge_detector
-  -- PORT MAP(
-  --   clock => clock,
-  --   reset => not_chaveacionada,
-  --   sinal => s_chaveacionada,
-  --   pulso => jogada_feita
-  -- );
   
   timer: contador_m
   PORT MAP(
 		clock   => clock,
-    zera_as => zeraTMR,
+    zera_as => reset_timer,
     zera_s  => '0',
-    conta   => contaTMR,
-    Q       => open,
-    fim     => fimTMR,
+    conta   => enable_timer,
+    Q       => tempo_jogada,
+    fim     => timeout,
     meio    => open
   );
 
@@ -275,14 +271,12 @@ BEGIN
   PORT MAP(
     clock => clock,
     clr   => reset_contagem,
-    ld    => '1',
+    ld    => '0',
     ent   => '1',
     enp   => incrementa_contagem,
-    D     => open,
+    D     => "000",
     Q     => s_contagem,
     rco   => fim_tentativas
   );
-
-  
 
 END estrutural;

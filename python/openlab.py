@@ -10,7 +10,7 @@ passwd = "L@Bdygy2A3"
 #Conectar via MQTT (IP da rede do laboratório)
 Broker = "labdigi.wiseful.com.br"           
 Port = 80                           
-KeepAlive = 60                      
+KeepAlive = 60
 
 tem_jogada = "0"
 
