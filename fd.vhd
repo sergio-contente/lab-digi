@@ -27,6 +27,7 @@ entity fluxo_dados is
   db_senha : out std_logic_vector (4 downto 0);
   db_jogada : out std_logic_vector (4 downto 0);
   db_partida : out std_logic_vector (2 downto 0)
+  leds: out std_logic_vector (9 downto 0)
   );
  end entity;
 
@@ -168,10 +169,27 @@ BEGIN
   db_contagem <= s_contagem;
   db_tem_jogada <= s_chaveacionada;
 
-  jogada_igual_senha <= '1' when "1111111111111111111111111",
+  jogada_igual_senha <= '1' when vec_saidas = "1000010000100001000010000",
                      <= '0' when others;
 
-  conta_partidas : contador_163
+  leds_colors : process( vec_saidas )
+  j : integer := 0;
+  k : integer := 1;
+  begin
+    assign_colors : for i in 0 to 4 loop
+      if vec_saidas(1) = '1' then
+        leds(j to j+1) = "00";
+      elsif vec_saidas(0) = '0' and (vec_saidas(k to k+3) /= "0000") then
+        leds(j to j+1) = "01"
+      else then
+        leds(j to j+1) = "10"
+      end if ;
+      j+=2;
+      k+=5;
+    end loop ; -- identifier
+  end process ; -- identifier
+
+  coleds_colors : contador_163
   PORT MAP(
     clock => clock, 
     clr   => reset, 
