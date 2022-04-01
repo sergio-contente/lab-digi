@@ -1,5 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+use ieee.numeric_std.all;
 use IEEE.MATH_REAL.ALL;
 
 entity fluxo_dados is
@@ -9,7 +10,7 @@ entity fluxo_dados is
   reset_timer : in std_logic;
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
-  jogada:  in std_logic (24 downto 0);
+  jogada:  in std_logic_vector(24 downto 0);
   --ganhou : in std_logic;
   --perdeu : in std_logic;
   --pronto : in std_logic;
@@ -26,7 +27,7 @@ entity fluxo_dados is
   db_contagem : out std_logic_vector (2 downto 0);
   db_senha : out std_logic_vector (4 downto 0);
   db_jogada : out std_logic_vector (4 downto 0);
-  db_partida : out std_logic_vector (2 downto 0)
+  db_partida : out std_logic_vector (2 downto 0);
   leds: out std_logic_vector (9 downto 0)
   );
  end entity;
@@ -149,8 +150,8 @@ BEGIN
   regs: for i in 0 to 24 generate
     --n = 25
     comparadores: comparador_igualdade port map(
-      jogada_in => vec_jogadas(i)
-      senha_in => vec_senhas(i)
+      jogada_in => vec_jogadas(i);
+      senha_in => vec_senhas(i);
       -- i_AEQB : in  std_logic;
       o_AEQB => vec_saidas(i)
     );
@@ -178,14 +179,14 @@ BEGIN
   begin
     assign_colors : for i in 0 to 4 loop
       if vec_saidas(1) = '1' then
-        leds(j to j+1) = "00";
+        leds(j to j+1) <= "00";
       elsif vec_saidas(0) = '0' and (vec_saidas(k to k+3) /= "0000") then
-        leds(j to j+1) = "01"
+        leds(j to j+1) <= "01"
       else then
-        leds(j to j+1) = "10"
+        leds(j to j+1) <= "10"
       end if ;
-      j+=2;
-      k+=5;
+      j:=j+2;
+      k:=k+5;
     end loop ; -- identifier
   end process ; -- identifier
 
@@ -211,58 +212,59 @@ BEGIN
     Q => s_jogada
   );
 
-  s_jogada(0 to 4) => vec_jogadas(0);
-  s_jogada(0 to 4) => vec_jogadas(1);
-  s_jogada(0 to 4) => vec_jogadas(2);
-  s_jogada(0 to 4) => vec_jogadas(3);
-  s_jogada(0 to 4) => vec_jogadas(4);
-  s_jogada(5 to 9) => vec_jogadas(5);
-  s_jogada(5 to 9) => vec_jogadas(6);
-  s_jogada(5 to 9) => vec_jogadas(7);
-  s_jogada(5 to 9) => vec_jogadas(8);
-  s_jogada(5 to 9) => vec_jogadas(9);
-  s_jogada(10 to 14) => vec_jogadas(10);
-  s_jogada(10 to 14) => vec_jogadas(11);
-  s_jogada(10 to 14) => vec_jogadas(12);
-  s_jogada(10 to 14) => vec_jogadas(13);
-  s_jogada(10 to 14) => vec_jogadas(14);
-  s_jogada(15 to 19) => vec_jogadas(15);
-  s_jogada(15 to 19) => vec_jogadas(16);
-  s_jogada(15 to 19) => vec_jogadas(17);
-  s_jogada(15 to 19) => vec_jogadas(18);
-  s_jogada(15 to 19) => vec_jogadas(19);
-  s_jogada(20 to 24) => vec_jogadas(20);
-  s_jogada(20 to 24) => vec_jogadas(21);
-  s_jogada(20 to 24) => vec_jogadas(22);
-  s_jogada(20 to 24) => vec_jogadas(23);
-  s_jogada(20 to 24) => vec_jogadas(24);
+  vec_jogadas(0) := s_jogada(0 to 4);
+  vec_jogadas(1) := s_jogada(0 to 4);
+  vec_jogadas(2) := s_jogada(0 to 4);
+  vec_jogadas(3) := s_jogada(0 to 4);
+  vec_jogadas(4) := s_jogada(0 to 4);
+  vec_jogadas(5) := s_jogada(5 to 9);
+  vec_jogadas(6) := s_jogada(5 to 9);
+  vec_jogadas(7) := s_jogada(5 to 9);
+  vec_jogadas(8) := s_jogada(5 to 9);
+  vec_jogadas(9) := s_jogada(5 to 9);
+  vec_jogadas(10) := s_jogada(10 to 14);
+  vec_jogadas(11) := s_jogada(10 to 14);
+  vec_jogadas(12) := s_jogada(10 to 14);
+  vec_jogadas(13) := s_jogada(10 to 14);
+  vec_jogadas(14) := s_jogada(10 to 14);
+  vec_jogadas(15) := s_jogada(15 to 19);
+  vec_jogadas(16) := s_jogada(15 to 19);
+  vec_jogadas(17) := s_jogada(15 to 19);
+  vec_jogadas(18) := s_jogada(15 to 19);
+  vec_jogadas(19) := s_jogada(15 to 19);
+  vec_jogadas(20) := s_jogada(20 to 24);
+  vec_jogadas(21) := s_jogada(20 to 24);
+  vec_jogadas(22) := s_jogada(20 to 24);
+  vec_jogadas(23) := s_jogada(20 to 24);
+  vec_jogadas(24) := s_jogada(20 to 24);
 
-  s_senha(0 to 4) => vec_senhas(0);
-  s_senha(5 to 9) => vec_senhas(1);
-  s_senha(10 to 14) => vec_senhas(2);
-  s_senha(15 to 19) => vec_senhas(3);
-  s_senha(20 to 24) => vec_senhas(4);
-  s_senha(0 to 4) => vec_senhas(5);
-  s_senha(5 to 9) => vec_senhas(6);
-  s_senha(10 to 14) => vec_senhas(7);
-  s_senha(15 to 19) => vec_senhas(8);
-  s_senha(20 to 24) => vec_senhas(9);
-  s_senha(0 to 4) => vec_senhas(10);
-  s_senha(5 to 9) => vec_senhas(11);
-  s_senha(10 to 14) => vec_senhas(12);
-  s_senha(15 to 19) => vec_senhas(13);
-  s_senha(20 to 24) => vec_senhas(14);
-  s_senha(0 to 4) => vec_senhas(15);
-  s_senha(5 to 9) => vec_senhas(16);
-  s_senha(10 to 14) => vec_senhas(17);
-  s_senha(15 to 19) => vec_senhas(18);
-  s_senha(20 to 24) => vec_senhas(19);
-  s_senha(0 to 4) => vec_senhas(20);
-  s_senha(5 to 9) => vec_senhas(21);
-  s_senha(10 to 14) => vec_senhas(22);
-  s_senha(15 to 19) => vec_senhas(23);
-  s_senha(20 to 24) => vec_senhas(24);
-  
+
+  vec_senhas(0) :=  s_senha(0 to 4);    
+  vec_senhas(1) :=  s_senha(5 to 9);   
+  vec_senhas(2) :=  s_senha(10 to 14);  
+  vec_senhas(3) :=  s_senha(15 to 19);  
+  vec_senhas(4) :=  s_senha(20 to 24);  
+  vec_senhas(5) :=  s_senha(0 to 4);    
+  vec_senhas(6) :=  s_senha(5 to 9);    
+  vec_senhas(7) :=  s_senha(10 to 14);  
+  vec_senhas(8) :=  s_senha(15 to 19);  
+  vec_senhas(9) :=  s_senha(20 to 24);  
+  vec_senhas(10):=  s_senha(0 to 4);    
+  vec_senhas(11):=  s_senha(5 to 9);    
+  vec_senhas(12):=  s_senha(10 to 14);  
+  vec_senhas(13):=  s_senha(15 to 19);  
+  vec_senhas(14):=  s_senha(20 to 24);  
+  vec_senhas(15):=  s_senha(0 to 4);    
+  vec_senhas(16):=  s_senha(5 to 9);    
+  vec_senhas(17):=  s_senha(10 to 14);  
+  vec_senhas(18):=  s_senha(15 to 19);  
+  vec_senhas(19):=  s_senha(20 to 24);  
+  vec_senhas(20):=  s_senha(0 to 4);    
+  vec_senhas(21):=  s_senha(5 to 9);    
+  vec_senhas(22):=  s_senha(10 to 14);  
+  vec_senhas(23):=  s_senha(15 to 19);  
+  vec_senhas(24):=  s_senha(20 to 24);  
+ 
   memoria: ram_16x25  -- usar para Quartus
   --memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
   PORT MAP(
