@@ -13,8 +13,13 @@ Port = 80
 KeepAlive = 60                      
 
 tem_jogada = "0"
+time_score = ""
 
 palavra = ""
+
+def get_time_score():
+  return time_score
+
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
   print("Conectado com codigo " + str(rc))
@@ -27,8 +32,7 @@ def publish_word(palavra):
   for letra in palavra:
     letra_bin = get_signal(letra)
     for i in range(len(letra_bin)):
-      (result, mid) = client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
-      #print(result)
+      client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
       palavra_ant = palavra
       client.loop_stop()
       client.loop_start()
@@ -38,13 +42,15 @@ def publish_word(palavra):
 def on_message(client, userdata, msg):
   #print(type(msg.payload.decode("utf-8")))
   global palavra
-  palavra = str(msg.payload.decode("utf-8"))
-  print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
-
+  global time_score
+ 
   if str(msg.topic) == user+"/E0":
     print("Recebi uma mensagem de E0")
+    time_score = str(msg.payload.decode("utf-8"))
   elif str(msg.topic) == user+"/E1":
     print("Recebi uma mensagem de E1")
+    palavra = str(msg.payload.decode("utf-8"))
+    print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
   else:
     print("Erro! Mensagem recebida de tópico estranho")
 
