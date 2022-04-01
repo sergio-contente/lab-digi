@@ -10,12 +10,8 @@ entity fluxo_dados is
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
   jogada:  in std_logic (24 downto 0);
-  --ganhou : in std_logic;
-  --perdeu : in std_logic;
-  --pronto : in std_logic;
   fim_tentativas : out std_logic;
 	jogada_igual_senha : out std_logic;
-  --atualiza_resultado : in std_logic;
   incrementa_contagem : in std_logic;
   incrementa_partida : in std_logic;
   clr_jogada : in std_logic;
@@ -49,12 +45,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_chaveacionada: std_logic;
   SIGNAL not_chaveacionada: std_logic;
 
-  component alfabeto7seg is
-    port (
-        letra : in  std_logic_vector(4 downto 0);
-        sseg   : out std_logic_vector(6 downto 0)
-    );
-  end component;
+
 
   component registrador_25 is
     port (
@@ -127,24 +118,6 @@ end component;
 
 BEGIN
 
-  -- regs: for n in 25 downto 5 generate
-  --   --n = 25
-  --   comparadores: comparador_igualdade port map(
-  --     i_A4   => s_dado(n-1)
-  --     i_B4   => s_memoria(n-1)
-  --     i_A3   => s_dado(n-2)
-  --     i_B3   => s_memoria(n-2)
-  --     i_A2   => s_dado(n-3)
-  --     i_B2   => s_memoria(n-3)
-  --     i_A1   => s_dado(n-4)
-  --     i_B1   => s_memoria(n-4)
-  --     i_A0   => s_dado(n-5)
-  --     i_B0   => s_memoria(n-5)
-  --     -- i_AEQB : in  std_logic;
-  --     o_AEQB => igual(n/5)
-  --   );
-  -- end generate;
-  
   regs: for i in 0 to 24 generate
     --n = 25
     comparadores: comparador_igualdade port map(
@@ -168,7 +141,7 @@ BEGIN
   db_contagem <= s_contagem;
   db_tem_jogada <= s_chaveacionada;
 
-  jogada_igual_senha <= '1' when "1111111111111111111111111",
+  jogada_igual_senha <= '1' when vec_saidas = "1111111111111111111111111",
                      <= '0' when others;
 
   conta_partidas : contador_163

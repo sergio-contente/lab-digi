@@ -1,19 +1,3 @@
---------------------------------------------------------------------------
--- Arquivo   : circuito_exp5_tb_modelo.vhd
--- Projeto   : Experiencia 05 - Jogo Base do Desafio da Memoria
---                              
---------------------------------------------------------------------------
--- Descricao : modelo de testbench para simulação com ModelSim
---
---             implementa o Cenário de Teste 2 do Plano de Teste
---             - acerta as 4 primeiras rodadas  
---               e erra a segunda jogada da 5a rodada
---             - usa array de casos de teste
---------------------------------------------------------------------------
--- Revisoes  :
---     Data        Versao  Autor             Descricao
---     04/02/2022  1.0     Edson Midorikawa  criacao (adaptado da Exp.4)
---------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;

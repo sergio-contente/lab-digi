@@ -25,66 +25,72 @@ ENTITY circuito_exp5 IS
 END ENTITY;
 
 ARCHITECTURE arch_exp5 OF circuito_exp5 IS
+
+	COMPONENT alfabeto7seg is
+		port (
+			letra : in  std_logic_vector(4 downto 0);
+			sseg   : out std_logic_vector(6 downto 0)
+		);
+  	end COMPONENT;
+
 	COMPONENT fluxo_dados IS
 	port (
 		clock : in std_logic;
-		contaS : in std_logic;
-		zeraS : in std_logic;
-		contaE : in std_logic;
-		zeraE : in std_logic;
-		registraR : in std_logic;
-		botoes : in std_logic_vector (3 downto 0);
-		limpaR : in std_logic;
-		limpaM : in std_logic;
-		contaTMR : in std_logic;
-		zeraTMR : in std_logic;
-		escreveM : in std_logic;
-		chavesIgualMemoria : out std_logic;
-		enderecoMenorOuIgualSequencia : out std_logic;
-		enderecoIgualSequencia : out std_logic;
-		fimS	: out std_logic;
-		fimE  : out std_logic;
-		fimTMR : out std_logic;
-		jogada_feita : out std_logic;
+		reset : in std_logic;
+		reset_timer : in std_logic;
+		enable_timer : in std_logic;
+		reset_contagem : in std_logic;
+		jogada:  in std_logic (24 downto 0);
+		fim_tentativas : out std_logic;
+		jogada_igual_senha : out std_logic;
+		incrementa_contagem : in std_logic;
+		incrementa_partida : in std_logic;
+		clr_jogada : in std_logic;
+		en_reg_jogada : in std_logic;
+		tempo_jogada : out unsigned;
+		timeout : out std_logic;
 		db_tem_jogada : out std_logic;
-		db_contagem : out std_logic_vector (3 downto 0);
-		db_memoria : out std_logic_vector (3 downto 0);
-		db_jogada : out std_logic_vector (3 downto 0);
-		db_sequencia: out std_logic_vector (3 downto 0)
+		db_contagem : out std_logic_vector (2 downto 0);
+		db_senha : out std_logic_vector (4 downto 0);
+		db_jogada : out std_logic_vector (4 downto 0);
+		db_partida : out std_logic_vector (2 downto 0)
+  );
 		);
 	END COMPONENT;
 
-	COMPONENT hexa7seg
+	COMPONENT alfabeto7seg
 		PORT (
 			hexa : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			sseg : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
 		);
 	END COMPONENT;
 
+	component estado7seg is
+		port (
+				estado : in  std_logic_vector(4 downto 0);
+				sseg   : out std_logic_vector(6 downto 0)
+		);
+	end component
+
 	COMPONENT unidade_controle IS
 		PORT (
 			clock : in std_logic;
 			reset : in std_logic;
 			iniciar : in std_logic;
-			fimE : in std_logic;
-			fimS : in std_logic;
-			fimTMR : in std_logic;
-			igualJ : in std_logic;
-			igualS : in std_logic;
-			jogada : in std_logic;
-			contaE : out std_logic;
-			contaS : out std_logic;
-			contaTMR : out std_logic;
+			fim_tentativas : in std_logic;
+			tem_jogada : in std_logic;
+			jogada_igual_senha : in std_logic;
+			reset_timer : out std_logic;
+			enable_timer : out std_logic;
+			reset_contagem : out std_logic;
 			ganhou : out std_logic;
-			limpaM : out std_logic;
-			limpaR : out std_logic;
 			perdeu : out std_logic;
 			pronto : out std_logic;
-			registraM : out std_logic;
-			registraR : out std_logic;
-			zeraE : out std_logic;
-			zeraS : out std_logic;
-			zeraTMR : out std_logic;
+			atualiza_resultado : out std_logic;
+			incrementa_contagem : out std_logic;
+			incrementa_partida : out std_logic;
+			clr_jogada : out std_logic;
+			en_reg_jogada : out std_logic;
 			db_estado : out std_logic_vector(3 downto 0)
 		);
 	END COMPONENT;
@@ -93,29 +99,13 @@ ARCHITECTURE arch_exp5 OF circuito_exp5 IS
 	SIGNAL s_jogada, s_contagem, s_memoria, s_sequencia, s_estado : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
 BEGIN
-	HEXA0 : hexa7seg
-	PORT MAP(
-		s_contagem, db_contagem
-	);
+	display_alfabeto: alfabeto7seg
+    PORT MAP (
+        letra => letra
+        sseg  => sseg
+    );
 
-	HEXA1 : hexa7seg
-	PORT MAP(
-		s_memoria, db_memoria
-	);
-
-	HEXA2 : hexa7seg
-	PORT MAP(
-		s_jogada, db_jogadafeita
-	);
-
-	HEXA3 : hexa7seg
-	PORT MAP(
-		s_sequencia, db_sequencia
-	);
-	HEXA4 : hexa7seg
-	PORT MAP(
-		s_estado, db_estado
-	);
+	
 
 	not_clock <= NOT clock;
 	db_chavesIgualMemoria <= s_igualMemoria;
