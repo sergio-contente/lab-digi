@@ -41,16 +41,15 @@ def publish_word(palavra):
 # Quando receber uma mensagem (Callback de mensagem)
 def on_message(client, userdata, msg):
   #print(type(msg.payload.decode("utf-8")))
-  global palavra
-  global time_score
- 
   if str(msg.topic) == user+"/E0":
+    global palavra
     print("Recebi uma mensagem de E0")
-    time_score = str(msg.payload.decode("utf-8"))
-  elif str(msg.topic) == user+"/E1":
-    print("Recebi uma mensagem de E1")
     palavra = str(msg.payload.decode("utf-8"))
     print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
+  elif str(msg.topic) == user+"/E1":
+    global time_score
+    print("Recebi uma mensagem de E1")
+    time_score = str(msg.payload.decode("utf-8"))
   else:
     print("Erro! Mensagem recebida de tópico estranho")
 
