@@ -2,12 +2,12 @@
 #include <PubSubClient.h>
 #include "pitches.h"
 
-String user = "login_MQTT";
-String passwd = "senha_MQTT";
+String user = "grupo2-bancadaA3";
+String passwd = "L@Bdygy2A3";
 
 const char* ssid = "ssid_WiFi";
 const char* password = "senha_WiFi";
-const char* mqtt_server = "endereco_broker";
+const char* mqtt_server = "labdigi.wiseful.com.br";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -17,17 +17,17 @@ char msg[MSG_BUFFER_SIZE];
 
 int value = 0; //sinal de heartbeat
 
-bool prevBtn1 = 0; //estado anterior do botão
-bool btn1 = 0; //estado atual do botão
+// bool prevBtn1 = 0; //estado anterior do botão
+// bool btn1 = 0; //estado atual do botão
 
-bool prevBtn2 = 0; //estado anterior do botão
-bool btn2 = 0; //estado atual do botão
+// bool prevBtn2 = 0; //estado anterior do botão
+// bool btn2 = 0; //estado atual do botão
 
-bool prevBtn3 = 0; //estado anterior do botão
-bool btn3 = 0; //estado atual do botão
+// bool prevBtn3 = 0; //estado anterior do botão
+// bool btn3 = 0; //estado atual do botão
 
-bool prevBtn4 = 0; //estado anterior do botão
-bool btn4 = 0; //estado atual do botão
+// bool prevBtn4 = 0; //estado anterior do botão
+// bool btn4 = 0; //estado atual do botão
 
 bool led = 0; //estado do led
 
@@ -46,6 +46,15 @@ void setup_wifi() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
+
+// bool prevBtn2 = 0; //estado anterior do botão
+// bool btn2 = 0; //estado atual do botão
+
+// bool prevBtn3 = 0; //estado anterior do botão
+// bool btn3 = 0; //estado atual do botão
+
+// bool prevBtn4 = 0; //estado anterior do botão
+// bool btn4 = 0; //estado atual do botão
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -83,29 +92,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
   }
 
-  if (strcmp(topic,(user+"/S0").c_str())==0) {
+  if (strcmp(topic,(user+"/E0").c_str())==0) {
     if ((char)payload[0] == '1') {
-      tone(D5, NOTE_FS6, 250); //125 ou 250
+      // tone(D5, NOTE_FS6, 250); //125 ou 250
     }
   }
 
-  if (strcmp(topic,(user+"/S1").c_str())==0) {
-    if ((char)payload[0] == '1') {
-      tone(D5, NOTE_C4, 250); //125 ou 250
-    }
-  }
+  // if (strcmp(topic,(user+"/S1").c_str())==0) {
+  //   if ((char)payload[0] == '1') {
+  //     // tone(D5, NOTE_C4, 250); //125 ou 250
+  //   }
+  // }
 
-  if (strcmp(topic,(user+"/S2").c_str())==0) {
-    if ((char)payload[0] == '1') {
-      tone(D5, NOTE_DS5, 250); //125 ou 250
-    }
-  }
+  // if (strcmp(topic,(user+"/S2").c_str())==0) {
+  //   if ((char)payload[0] == '1') {
+  //     // tone(D5, NOTE_DS5, 250); //125 ou 250
+  //   }
+  // }
 
-  if (strcmp(topic,(user+"/S3").c_str())==0) {
-    if ((char)payload[0] == '1') {
-      tone(D5, NOTE_A7, 250); //125 ou 250
-    }
-  }
+  // if (strcmp(topic,(user+"/S3").c_str())==0) {
+  //   if ((char)payload[0] == '1') {
+  //     // tone(D5, NOTE_A7, 250); //125 ou 250
+  //   }
+  // }
+
 }
 
 void reconnect() {
@@ -127,10 +137,11 @@ void reconnect() {
 
       client.subscribe((user+"/ledhome").c_str());
 
-      client.subscribe((user+"/S0").c_str());
-      client.subscribe((user+"/S1").c_str());
-      client.subscribe((user+"/S2").c_str());
-      client.subscribe((user+"/S3").c_str());
+      client.subscribe((user+"/E0").c_str());
+      client.subscribe((user+"/E1").c_str());
+      client.subscribe((user+"/E2").c_str());
+      client.subscribe((user+"/E3").c_str());
+      client.subscribe((user+"/E4").c_str());
       
     } else {
       
@@ -150,9 +161,9 @@ void setup() {
   pinMode(D5, OUTPUT);
 
   pinMode(D1, INPUT); //botão como input
-  pinMode(D2, INPUT); //botão como input
-  pinMode(D6, INPUT); //botão como input
-  pinMode(D7, INPUT); //botão como input
+  // pinMode(D2, INPUT); //botão como input
+  // pinMode(D6, INPUT); //botão como input
+  // pinMode(D7, INPUT); //botão como input
   
   Serial.begin(115200);
   
@@ -169,54 +180,54 @@ void loop() {
   }
   client.loop();
 
-  if(prev_millis!=millis()){
-    prev_millis=millis();
-    if(ms_cnt%100==0){
+  // if(prev_millis!=millis()){
+  //   prev_millis=millis();
+  //   if(ms_cnt%100==0){
       
-      btn1 = digitalRead(D1); //leitura do estado do botão
-      if (!prevBtn1 and btn1){
-        Serial.println("botão 1 pressionado (borda de subida)");
-        client.publish((user+"/E3").c_str(), one_cstr); // botão virtual
-      }
-      prevBtn1 = btn1;
+  //     btn1 = digitalRead(D1); //leitura do estado do botão
+  //     if (!prevBtn1 and btn1){
+  //       Serial.println("botão 1 pressionado (borda de subida)");
+  //       client.publish((user+"/E3").c_str(), one_cstr); // botão virtual
+  //     }
+  //     prevBtn1 = btn1;
 
-      btn2 = digitalRead(D2); //leitura do estado do botão
-      if (!prevBtn2 and btn2){
-        Serial.println("botão 2 pressionado (borda de subida)");
-        client.publish((user+"/E4").c_str(), one_cstr); // botão virtual
-      }
-      prevBtn2 = btn2;
+  //     btn2 = digitalRead(D2); //leitura do estado do botão
+  //     if (!prevBtn2 and btn2){
+  //       Serial.println("botão 2 pressionado (borda de subida)");
+  //       client.publish((user+"/E4").c_str(), one_cstr); // botão virtual
+  //     }
+  //     prevBtn2 = btn2;
 
-      btn3 = digitalRead(D6); //leitura do estado do botão
-      if (!prevBtn3 and btn3){
-        Serial.println("botão 3 pressionado (borda de subida)");
-        client.publish((user+"/E5").c_str(), one_cstr); // botão virtual
-      }
-      prevBtn3 = btn3;
+  //     btn3 = digitalRead(D6); //leitura do estado do botão
+  //     if (!prevBtn3 and btn3){
+  //       Serial.println("botão 3 pressionado (borda de subida)");
+  //       client.publish((user+"/E5").c_str(), one_cstr); // botão virtual
+  //     }
+  //     prevBtn3 = btn3;
 
-      btn4 = digitalRead(D7); //leitura do estado do botão
-      if (!prevBtn4 and btn4){
-        Serial.println("botão 4 pressionado (borda de subida)");
-        client.publish((user+"/E6").c_str(), one_cstr); // botão virtual
-      }
-      prevBtn4 = btn4;
+  //     btn4 = digitalRead(D7); //leitura do estado do botão
+  //     if (!prevBtn4 and btn4){
+  //       Serial.println("botão 4 pressionado (borda de subida)");
+  //       client.publish((user+"/E6").c_str(), one_cstr); // botão virtual
+  //     }
+  //     prevBtn4 = btn4;
       
-    }
-    ms_cnt++;
-  }
+  //   }
+  //   ms_cnt++;
+  // }
 
-  unsigned long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    ++value;
-    snprintf (msg, MSG_BUFFER_SIZE, "#%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish((user+"/homehello").c_str(), msg);
+  // unsigned long now = millis();
+  // if (now - lastMsg > 2000) {
+  //   lastMsg = now;
+  //   ++value;
+  //   snprintf (msg, MSG_BUFFER_SIZE, "#%ld", value);
+  //   Serial.print("Publish message: ");
+  //   Serial.println(msg);
+  //   client.publish((user+"/homehello").c_str(), msg);
 
-    client.publish((user+"/E3").c_str(), zero_cstr); // botão virtual
-    client.publish((user+"/E4").c_str(), zero_cstr); // botão virtual
-    client.publish((user+"/E5").c_str(), zero_cstr); // botão virtual
-    client.publish((user+"/E6").c_str(), zero_cstr); // botão virtual
-  }
+  //   client.publish((user+"/E3").c_str(), zero_cstr); // botão virtual
+  //   client.publish((user+"/E4").c_str(), zero_cstr); // botão virtual
+  //   client.publish((user+"/E5").c_str(), zero_cstr); // botão virtual
+  //   client.publish((user+"/E6").c_str(), zero_cstr); // botão virtual
+  // }
 }

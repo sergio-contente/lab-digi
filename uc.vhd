@@ -18,6 +18,8 @@ entity unidade_controle is
     atualiza_resultado : out std_logic;
     incrementa_contagem : out std_logic;
     incrementa_partida : out std_logic;
+    clr_jogada : out std_logic;
+    en_reg_jogada : out std_logic;
     db_estado : out std_logic_vector(3 downto 0)
     );
    end entity;
@@ -51,8 +53,8 @@ begin
         espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0') or (Eatual=compara and (not fim_tentativas) and (not jogada_igual_senha)) else
         compara                 when  Eatual=espera_jogada and tem_jogada else
         fim_perdeu              when  Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = 1 else
-        ganhou                  when  Eatual=compara and jogada_igual_senha = '1' else
-        espera                  when  Eatual=fim_perdeu or Eatual=ganhou else
+        fim_ganhou              when  Eatual=compara and jogada_igual_senha = '1' else
+        espera                  when  Eatual=fim_perdeu or Eatual=fim_ganhou else
         espera;
 
     -- logica de saída (maquina de Moore)
@@ -60,11 +62,14 @@ begin
         reset_timer <='1' when preparacao_jogo,
                       '0' when others;
     with Eatual select
-	    enable_timer <='1' when preparacao_jogo,
+	    enable_timer <='1' when espera_jogada,
                        '0' when fim_perdeu,
                        '0' when fim_ganhou;
     with Eatual select
 	    reset_contagem <='1' when preparacao_jogo,
+                         '0' when others;
+    with Eatual select
+	    en_reg_jogada <= '1' when compara,
                          '0' when others;
     with Eatual select
         ganhou <=     '1' when fim_ganhou,
@@ -76,6 +81,9 @@ begin
         pronto <=     '1' when fim_perdeu,
                       '1' when fim_ganhou,
                       '0' when preparacao_jogo;
+    with Eatual select
+        clr_jogada <= '1' when preparacao_jogo,
+                      '0' when others;
     with Eatual select
         db_estado <=  "0000" when espera,     -- 0
                       "0001" when preparacao_jogo,  -- 1

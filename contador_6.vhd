@@ -24,8 +24,8 @@ begin
     begin
     
         if clock'event and clock='1' then
-            if clr='0' then   IQ <= 0; 
-            elsif ld='0' then IQ <= to_integer(unsigned(D));
+            if clr='1' then   IQ <= 0; 
+            elsif ld='1' then IQ <= to_integer(unsigned(D));
             elsif ent='1' and enp='1' then
                 if IQ=5 then IQ <= 0; 
                 else          IQ <= IQ + 1; 

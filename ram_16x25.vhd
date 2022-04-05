@@ -27,7 +27,7 @@ use ieee.numeric_std.all;
 entity ram_25x16 is
    port (       
        clk          : in  std_logic;
-       endereco     : in  std_logic_vector(15 downto 0);
+       endereco     : in  std_logic_vector(3 downto 0);
        dado_entrada : in  std_logic_vector(24 downto 0);
        we           : in  std_logic;
        ce           : in  std_logic;
