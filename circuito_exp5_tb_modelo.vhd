@@ -7,7 +7,7 @@
 --
 --             implementa o Cenário de Teste 2 do Plano de Teste
 --             - acerta as 4 primeiras rodadas  
---               e erra a segunda jogada da 5a rodada
+--               e erra a segunda jogada da 6a rodada
 --             - usa array de casos de teste
 --------------------------------------------------------------------------
 -- Revisoes  :

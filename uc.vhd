@@ -15,7 +15,6 @@ entity unidade_controle is
     ganhou : out std_logic;
     perdeu : out std_logic;
     pronto : out std_logic;
-    atualiza_resultado : out std_logic;
     incrementa_contagem : out std_logic;
     incrementa_partida : out std_logic;
     clr_jogada : out std_logic;

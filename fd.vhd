@@ -10,7 +10,7 @@ entity fluxo_dados is
   reset_timer : in std_logic;
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
-  jogada:  in std_logic_vector(24 downto 0);
+  jogada : in std_logic_vector(24 downto 0);
   fim_tentativas : out std_logic;
 	jogada_igual_senha : out std_logic;
   incrementa_contagem : in std_logic;
@@ -18,9 +18,8 @@ entity fluxo_dados is
   clr_jogada : in std_logic;
   en_reg_jogada : in std_logic;
   tempo_jogada : out std_logic_vector(26 downto 0);
-  timeout : out std_logic;
-  db_contagem : out std_logic_vector (2 downto 0);
-  db_partida : out std_logic_vector (3 downto 0);
+  db_contagem : out std_logic_vector(2 downto 0);
+  db_partida : out std_logic_vector(3 downto 0);
   leds: out std_logic_vector (9 downto 0)
   );
  end entity;
@@ -101,15 +100,6 @@ ARCHITECTURE estrutural OF fluxo_dados IS
    );
   end component;
 
-  component edge_detector is
-    port (
-        clock  : in  std_logic;
-        reset  : in  std_logic;
-        sinal  : in  std_logic;
-        pulso  : out std_logic
-    );
-  end component;
-
   component contador_m is
     generic (
         constant M: integer := 100 -- modulo do contador
@@ -163,7 +153,7 @@ BEGIN
     end loop ; -- identifier
   end process ; -- identifier
 
-  coleds_colors : contador_163
+  contador_partida : contador_163
   PORT MAP(
     clock => clock, 
     clr   => reset, 
@@ -261,7 +251,7 @@ BEGIN
     zera_s  => '0',
     conta   => enable_timer,
     Q       => tempo_jogada,
-    fim     => timeout,
+    fim     => open,
     meio    => open
   );
 
