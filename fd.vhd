@@ -11,12 +11,8 @@ entity fluxo_dados is
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
   jogada:  in std_logic_vector(24 downto 0);
-  --ganhou : in std_logic;
-  --perdeu : in std_logic;
-  --pronto : in std_logic;
   fim_tentativas : out std_logic;
 	jogada_igual_senha : out std_logic;
-  --atualiza_resultado : in std_logic;
   incrementa_contagem : in std_logic;
   incrementa_partida : in std_logic;
   clr_jogada : in std_logic;
@@ -24,8 +20,6 @@ entity fluxo_dados is
   tempo_jogada : out std_logic_vector(26 downto 0);
   timeout : out std_logic;
   db_contagem : out std_logic_vector (2 downto 0);
-  db_senha : out std_logic_vector (4 downto 0);
-  db_jogada : out std_logic_vector (24 downto 0);
   db_partida : out std_logic_vector (3 downto 0);
   leds: out std_logic_vector (9 downto 0)
   );
@@ -158,8 +152,6 @@ BEGIN
   leds_colors : process( vec_saidas ) is 
   variable pos : integer := 0;
   begin
--- vec_saidas -> 10000 01000 00100 00010 00001
--- leds -> 0000000000
     assign_colors : for i in 0 to 4 loop
       if vec_saidas(5*i + 4 downto 5*i) = "00000" then
         leds(i + 1 downto i) <= "10"; -- vermelho

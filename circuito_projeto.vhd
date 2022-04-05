@@ -28,29 +28,22 @@ ARCHITECTURE arch_exp5 OF circuito_exp5 IS
 	COMPONENT fluxo_dados IS
 	port (
 		clock : in std_logic;
-		contaS : in std_logic;
-		zeraS : in std_logic;
-		contaE : in std_logic;
-		zeraE : in std_logic;
-		registraR : in std_logic;
-		botoes : in std_logic_vector (3 downto 0);
-		limpaR : in std_logic;
-		limpaM : in std_logic;
-		contaTMR : in std_logic;
-		zeraTMR : in std_logic;
-		escreveM : in std_logic;
-		chavesIgualMemoria : out std_logic;
-		enderecoMenorOuIgualSequencia : out std_logic;
-		enderecoIgualSequencia : out std_logic;
-		fimS	: out std_logic;
-		fimE  : out std_logic;
-		fimTMR : out std_logic;
-		jogada_feita : out std_logic;
-		db_tem_jogada : out std_logic;
-		db_contagem : out std_logic_vector (3 downto 0);
-		db_memoria : out std_logic_vector (3 downto 0);
-		db_jogada : out std_logic_vector (3 downto 0);
-		db_sequencia: out std_logic_vector (3 downto 0)
+		reset : in std_logic;
+		reset_timer : in std_logic;
+		  enable_timer : in std_logic;
+		  reset_contagem : in std_logic;
+		jogada:  in std_logic_vector(24 downto 0);
+		fim_tentativas : out std_logic;
+		  jogada_igual_senha : out std_logic;
+		incrementa_contagem : in std_logic;
+		incrementa_partida : in std_logic;
+		clr_jogada : in std_logic;
+		en_reg_jogada : in std_logic;
+		tempo_jogada : out std_logic_vector(26 downto 0);
+		timeout : out std_logic;
+		db_contagem : out std_logic_vector (2 downto 0);
+		db_partida : out std_logic_vector (3 downto 0);
+		leds: out std_logic_vector (9 downto 0)
 		);
 	END COMPONENT;
 

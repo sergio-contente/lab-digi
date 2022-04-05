@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------
 -- Revisoes  :
 --     Data        Versao  Autor             Descricao
---     04/02/2022  1.0     Edson Midorikawa  criacao (adaptado da Exp.4)
+--     04/02/2022  1.0     Jona_  criacao (adaptado da Exp.4)
 --------------------------------------------------------------------------
 
 library ieee;
