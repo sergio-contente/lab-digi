@@ -23,7 +23,6 @@ entity fluxo_dados is
   en_reg_jogada : in std_logic;
   tempo_jogada : out std_logic_vector(26 downto 0);
   timeout : out std_logic;
-  db_tem_jogada : out std_logic;
   db_contagem : out std_logic_vector (2 downto 0);
   db_senha : out std_logic_vector (4 downto 0);
   db_jogada : out std_logic_vector (24 downto 0);

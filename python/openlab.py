@@ -65,17 +65,17 @@ client.loop_start()
 # A primeira mensagem costuma ser perdida aqui no notebook
 client.publish(user+"/S0", payload="0", qos=0, retain=False)
 palavra_ant = palavra
-
 time.sleep(1)
 while True:
   if palavra_ant != palavra:
     tem_jogada = "1"
     publish_word(palavra)
-    time.sleep(1)
-  else:
+    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
+    time.sleep(2)
+  elif tem_jogada == "1":
     tem_jogada = "0"
-  client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
-
+    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
+    time.sleep(2)
 client.loop_stop()
 
 client.disconnect()
