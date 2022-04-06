@@ -30,7 +30,7 @@ architecture fsm of unidade_controle is
             espera_jogada,
             compara,
             fim_perdeu,
-            fim_ganhou,
+            fim_ganhou
         );
     signal Eatual, Eprox: t_estado;
 begin
@@ -49,21 +49,27 @@ begin
     Eprox <=
         espera                  when  Eatual=espera and iniciar='0' else
         preparacao_jogo         when  Eatual=espera and iniciar='1' else
-        espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0') or (Eatual=compara and (not fim_tentativas) and (not jogada_igual_senha)) else
-        compara                 when  Eatual=espera_jogada and tem_jogada else
-        fim_perdeu              when  Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = 1 else
+        espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0') or (Eatual=compara and (fim_tentativas = '0') and (jogada_igual_senha = '0')) else
+        compara                 when  Eatual=espera_jogada and tem_jogada = '1' else
+        fim_perdeu              when  Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = '1' else
         fim_ganhou              when  Eatual=compara and jogada_igual_senha = '1' else
         espera                  when  Eatual=fim_perdeu or Eatual=fim_ganhou else
         espera;
 
     -- logica de saída (maquina de Moore)
+    ganhou <=     '1' when Eatual = fim_ganhou else
+                    '0' when Eatual = preparacao_jogo;
+    perdeu <=     '1' when Eatual = fim_perdeu else
+                    '0' when Eatual = preparacao_jogo;
+    pronto <=     '1' when Eatual = fim_perdeu else
+                    '1' when Eatual = fim_ganhou else
+                    '0' when Eatual = preparacao_jogo;
+    enable_timer <='1' when Eatual = espera_jogada else
+                    '0' when Eatual = fim_perdeu else
+                    '0' when Eatual = fim_ganhou;
     with Eatual select
         reset_timer <='1' when preparacao_jogo,
                       '0' when others;
-    with Eatual select
-	    enable_timer <='1' when espera_jogada,
-                       '0' when fim_perdeu,
-                       '0' when fim_ganhou;
     with Eatual select
 	    reset_contagem <='1' when preparacao_jogo,
                          '0' when others;
@@ -71,23 +77,12 @@ begin
 	    en_reg_jogada <= '1' when compara,
                          '0' when others;
     with Eatual select
-        ganhou <=     '1' when fim_ganhou,
-                      '0' when preparacao_jogo;
-    with Eatual select
-        perdeu <=     '1' when fim_perdeu,
-                      '0' when preparacao_jogo;
-    with Eatual select
-        pronto <=     '1' when fim_perdeu,
-                      '1' when fim_ganhou,
-                      '0' when preparacao_jogo;
-    with Eatual select
         clr_jogada <= '1' when preparacao_jogo,
                       '0' when others;
     with Eatual select
         db_estado <=  "0000" when espera,     -- 0
                       "0001" when preparacao_jogo,  -- 1
                       "0010" when espera_jogada,     -- 2
-                      "0011" when registra_jogada,  -- 3
                       "0100" when compara,    -- 4
                       "0101" when fim_perdeu,  -- 5
                       "0110" when fim_ganhou,     -- 6

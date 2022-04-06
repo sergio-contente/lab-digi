@@ -1,0 +1,9 @@
+
+State Machine - |circuito_projeto|unidade_controle:uc|Eatual
+Name Eatual.fim_ganhou Eatual.fim_perdeu Eatual.compara Eatual.espera_jogada Eatual.preparacao_jogo Eatual.espera 
+Eatual.espera 0 0 0 0 0 0 
+Eatual.preparacao_jogo 0 0 0 0 1 1 
+Eatual.espera_jogada 0 0 0 1 0 1 
+Eatual.compara 0 0 1 0 0 1 
+Eatual.fim_perdeu 0 1 0 0 0 1 
+Eatual.fim_ganhou 1 0 0 0 0 1 

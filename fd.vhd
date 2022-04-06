@@ -133,7 +133,6 @@ BEGIN
   end generate;
 					
   vetor_zero <= (others => '0');
-  db_jogada <= s_jogada;
   db_contagem <= s_contagem;
 
   jogada_igual_senha <= '1' when (vec_saidas(0) = '1' and vec_saidas(6) = '1' and vec_saidas(12) = '1' and vec_saidas(18) = '1' and vec_saidas(24) = '1') else
@@ -233,8 +232,8 @@ BEGIN
   vec_senhas(23) <=  s_senha(15 to 19);  
   vec_senhas(24) <=  s_senha(20 to 24);  
 
-  memoria: ram_16x25  -- usar para Quartus
-  --memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
+  --memoria : ram_16x25  -- usar para Quartus
+  memoria : entity work.ram_16x25(ram_modelsim) -- usar para ModelSim
   PORT MAP(
     clk => clock,
     endereco => s_endereco,

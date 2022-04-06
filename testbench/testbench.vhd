@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------
--- Arquivo   : circuito_exp5_tb_modelo.vhd
+-- Arquivo   : testbench.vhd
 -- Projeto   : Experiencia 05 - Jogo Base do Desafio da Memoria
 --                              
 --------------------------------------------------------------------------
@@ -20,10 +20,10 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity circuito_exp5_tb_modelo is
+entity testbench is
 end entity;
 
-architecture tb of circuito_exp5_tb_modelo is
+architecture tb of testbench is
 
     -- Componente a ser testado (Device Under Test -- DUT)
     component circuito_projeto
@@ -146,23 +146,31 @@ begin
         wait for 6 sec;
         ---- jogada #1 (ERRADA)
         jogada_in <= "0001000010000100001000001";
+        tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod; 
+        wait for 10*clockPeriod;
+        tem_jogada_in <= '0';
 
         ---- jogada #2 (ERRADA)
         jogada_in <= "0000100010000010000100001";
+        tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod; 
+        wait for 10*clockPeriod;
+        tem_jogada_in <= '0';
 
         ---- jogada #3 (ERRADA)
         jogada_in <= "0000100010000110001100011";
+        tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod; 
+        wait for 10*clockPeriod;
+        tem_jogada_in <= '0';
 
         ---- jogada #4 (CERTA)
         jogada_in <= "0000100010000110010000101";
+        tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod; 
+        wait for 10*clockPeriod;
+        tem_jogada_in <= '0';
 	
         -- espera depois da jogada final
         wait for 20*clockPeriod;  

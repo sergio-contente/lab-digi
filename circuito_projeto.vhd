@@ -35,7 +35,6 @@ ARCHITECTURE arch OF circuito_projeto IS
 			clr_jogada          : IN std_logic;
 			en_reg_jogada       : IN std_logic;
 			tempo_jogada        : OUT std_logic_vector(26 DOWNTO 0);
-			timeout             : OUT std_logic;
 			db_contagem         : OUT std_logic_vector (2 DOWNTO 0);
 			db_partida          : OUT std_logic_vector (3 DOWNTO 0);
 			leds                : OUT std_logic_vector (9 DOWNTO 0)
@@ -80,67 +79,69 @@ ARCHITECTURE arch OF circuito_projeto IS
 
 	SIGNAL 
 	  not_clock, fim_tentativas, jogada_igual_senha, reset_timer, enable_timer, reset_contagem, incrementa_contagem, incrementa_partida, clr_jogada, en_reg_jogada : STD_LOGIC;
-	SIGNAL tempo_jogada: STD_LOGIC_VECTOR(26 downto 0);
-	signal s_db_contagem : std_logic_vector(2 downto 0);
+	SIGNAL s_tempo_jogada: STD_LOGIC_VECTOR(26 downto 0);
+	signal s_db_contagem : std_logic_vector(3 downto 0);
 	signal s_db_partida, s_db_estado : std_logic_vector(3 downto 0);
 
 BEGIN
+	s_db_contagem(3) <= '0';
+
 	display_contagem : hexa7seg
 	port map(
-        hexa <= "0" + s_db_contagem;
-        sseg <= db_contagem
+        hexa => s_db_contagem,
+        sseg => db_contagem
 	);
 	display_partida : hexa7seg
 	port map(
-        hexa <= s_db_partida;
-        sseg <= db_partida
+        hexa => s_db_partida,
+        sseg => db_partida
 	);
 	display_estado : hexa7seg
 	port map(
-        hexa <= s_db_estado;
-        sseg <= db_contagem
+        hexa => s_db_estado,
+        sseg => db_estado
 	);
 
-	not_clock <= NOT clock;
+	not_clock <= (NOT clock);
 
 	fd : fluxo_dados
 	PORT MAP(
-		clock <= not_clock,
-		reset <= reset,
-		reset_timer <= reset_timer,
-		enable_timer <= enable_timer,
-		reset_contagem <= reset_contagem,
-		jogada <= jogada,
-		fim_tentativas <= fim_tentativas,
-		jogada_igual_senha <= jogada_igual_senha,
-		incrementa_contagem <= incrementa_contagem,
-		incrementa_partida <= incrementa_partida,
-		clr_jogada <= clr_jogada,
-		en_reg_jogada <= en_reg_jogada,
-		tempo_jogada <= tempo_jogada,
-		db_contagem <= s_db_contagem,
-		db_partida <= s_db_partida,
-		leds <= leds_rgb
+		clock => not_clock,
+		reset => reset,
+		reset_timer => reset_timer,
+		enable_timer => enable_timer,
+		reset_contagem => reset_contagem,
+		jogada => jogada,
+		fim_tentativas => fim_tentativas,
+		jogada_igual_senha => jogada_igual_senha,
+		incrementa_contagem => incrementa_contagem,
+		incrementa_partida => incrementa_partida,
+		clr_jogada => clr_jogada,
+		en_reg_jogada => en_reg_jogada,
+		tempo_jogada => s_tempo_jogada,
+		db_contagem => s_db_contagem(2 downto 0),
+		db_partida => s_db_partida,
+		leds => leds_rgb
 	);
 
 	uc : unidade_controle
 	PORT MAP(
-		clock <= clock,
-		reset <= reset,
-		iniciar <= iniciar,
-		fim_tentativas <= fim_tentativas,
-		tem_jogada <= tem_jogada,
-		jogada_igual_senha <= jogada_igual_senha,
-		reset_timer <= reset_timer,
-		enable_timer <= enable_timer,
-		reset_contagem <= reset_contagem,
-		ganhou <= ganhou,
-		perdeu <= perdeu,
-		pronto <= pronto, 
-		incrementa_contagem <= incrementa_contagem,
-		incrementa_partida <= incrementa_partida,
-		clr_jogada <= clr_jogada,
-		en_reg_jogada <= en_reg_jogada,
-		db_estado <= s_db_estado
+		clock => clock,
+		reset => reset,
+		iniciar => iniciar,
+		fim_tentativas => fim_tentativas,
+		tem_jogada => tem_jogada,
+		jogada_igual_senha => jogada_igual_senha,
+		reset_timer => reset_timer,
+		enable_timer => enable_timer,
+		reset_contagem => reset_contagem,
+		ganhou => ganhou,
+		perdeu => perdeu,
+		pronto => pronto, 
+		incrementa_contagem => incrementa_contagem,
+		incrementa_partida => incrementa_partida,
+		clr_jogada => clr_jogada,
+		en_reg_jogada => en_reg_jogada,
+		db_estado => s_db_estado
 	);
 END arch;
