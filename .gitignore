@@ -1,0 +1,7 @@
+*.bak
+*.qsf
+*.qpf
+*.txt
+*.mif
+db/
+output_files/
