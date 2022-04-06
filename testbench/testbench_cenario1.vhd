@@ -20,23 +20,24 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity testbench_1 is
+entity testbench_2 is
 end entity;
 
-architecture tb of testbench_1 is
+architecture tb of testbench_2 is
 
     -- Componente a ser testado (Device Under Test -- DUT)
     component circuito_projeto
 	PORT (
+		indice_letra: in std_logic_vector(2 downto 0);
 		clock        : IN std_logic;
 		reset        : IN std_logic;
 		iniciar      : IN std_logic;
 		tem_jogada   : IN std_logic;
-		jogada       : IN std_logic_vector(24 DOWNTO 0);
+		letra_jogada       : IN std_logic_vector(4 DOWNTO 0);
 		leds_rgb     : OUT std_logic_vector(9 DOWNTO 0);
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
-		db_contagem  : OUT std_logic_vector (6 DOWNTO 0);
-		db_partida   : OUT std_logic_vector (6 DOWNTO 0);
+		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
+		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
 		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
@@ -49,7 +50,8 @@ architecture tb of testbench_1 is
     signal rst_in           : std_logic := '0';
     signal iniciar_in       : std_logic := '0';
     signal tem_jogada_in    : std_logic := '0';
-    signal jogada_in           : std_logic_vector(24 downto 0) := "0000000000000000000000000";
+    signal indice_letra_in  : std_logic_vector(2 downto 0) := "000";
+    signal letra_jogada_in  : std_logic_vector(4 downto 0) := "00000";
     
     ---- Declaracao dos sinais de saida
     signal leds_rgb_out     : std_logic_vector(9 downto 0) := "0000000000";
@@ -101,11 +103,12 @@ begin
     dut: circuito_projeto
 	port map
      (
+        indice_letra => indice_letra_in,
 		clock        => clk_in,
 		reset        => rst_in,
 		iniciar      => iniciar_in,
 		tem_jogada   => tem_jogada_in,
-		jogada       => jogada_in,
+		letra_jogada => letra_jogada_in,
 		leds_rgb     => leds_rgb_out,
 		db_estado    => estado_out,
 		db_contagem  => contagem_out, 
@@ -117,89 +120,174 @@ begin
 	);
     
     ---- Gera sinais de estimulo para a simulacao
-
-    -- Cenario de Teste #1: Erra 6 jogadas
-    stimulus_1: process is
-        begin
+    
+    -- Cenario de Teste #2: Acerta as primeiras senha na 4 jogada 
+    stimulus_2: process is
+    begin
+    
+        -- inicio da simulacao
+        assert false report "inicio da simulacao" severity note;
+        keep_simulating <= '1';
+	    
+        -- gera pulso de reset (1 periodo de clock)
+        rst_in <= '1';
+        wait for clockPeriod;
+        rst_in <= '0';
+	    
+        wait until falling_edge(clk_in);
+        -- pulso do sinal de Iniciar
+        iniciar_in <= '1';
+        wait until falling_edge(clk_in);
+        iniciar_in <= '0';
+	    
+        wait for 10*clockPeriod;
+	    
+        -- Cenario de Teste 2
+        ---- jogadas da 5a rodada (erro na 2a jogada)
+        rodada_jogo <= 0;
+        -- espera antes da rodada
+        wait for 1 sec;
+        ---- jogada #1 (ERRADA)
         
-            -- inicio da simulacao
-            assert false report "inicio da simulacao" severity note;
-            keep_simulating <= '1';
-            
-            -- gera pulso de reset (1 periodo de clock)
-            rst_in <= '1';
-            wait for clockPeriod;
-            rst_in <= '0';
-            
-            wait until falling_edge(clk_in);
-            -- pulso do sinal de Iniciar
-            iniciar_in <= '1';
-            wait until falling_edge(clk_in);
-            iniciar_in <= '0';
-            
-            wait for 10*clockPeriod;
-            
-            -- Cenario de Teste 2
-            ---- jogadas da 5a rodada (erro na 2a jogada)
-            rodada_jogo <= 0;
-            -- espera antes da rodada
-            wait for 1 sec;
-            ---- jogada #1 (ERRADA)
-            jogada_in <= "0000100001000100000100001";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
-    
-            ---- jogada #2 (ERRADA)
-            jogada_in <= "0000100010001100001100011";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
-    
-            ---- jogada #3 (ERRADA)
-            jogada_in <= "0000100010000111100111000";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
-    
-            ---- jogada #4 (ERRADA)
-            jogada_in <= "0000100010001100010000001";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
 
-            ---- jogada #5 (ERRADA)
-            jogada_in <= "0000100010001100010000110";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
 
-            ---- jogada #6 (ERRADA)
-            jogada_in <= "1111111111111111111111111";
-            tem_jogada_in <= '1';
-            -- espera entre jogadas
-            wait for 0.75*clockPeriod;
-            tem_jogada_in <= '0';
-            wait for 9.25*clockPeriod;
-
-            -- espera depois da jogada final
-            wait for 20*clockPeriod;  
-            
-            ---- final do testbench
-            assert false report "fim da simulacao" severity note;
-            keep_simulating <= '0';
-            
-            wait; -- fim da simulação: processo aguarda indefinidamente
-        end process;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "11001";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "11000";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
+        
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00100";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
+        
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00100";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00110";
+        indice_letra_in <= "101";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
+        --espera entre jogadas
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00100";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00111";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
+	
+        -- espera depois da jogada final
+        wait for 20*clockPeriod;  
+	    
+        ---- final do testbench
+        assert false report "fim da simulacao" severity note;
+        keep_simulating <= '0';
+        
+        wait; -- fim da simulação: processo aguarda indefinidamente
+    end process;
 
 end architecture;
