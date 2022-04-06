@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import numpy as np
 import time
 
 from alphabet_translation import *
@@ -12,24 +13,39 @@ Broker = "labdigi.wiseful.com.br"
 Port = 80                           
 KeepAlive = 60
 
+tem_letra  = "1"
 tem_jogada = "0"
-
 palavra = ""
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
   print("Conectado com codigo " + str(rc))
-  client.subscribe(user+"/E0", qos=0)
   client.subscribe(user+"/E1", qos=0)
 
 def publish_word(palavra):
   print(palavra)
   global palavra_ant
+  global enable
+  global tem_letra
+  enable = 0
+  palavra_ant = palavra
   for letra in palavra:
     letra_bin = get_signal(letra)
     for i in range(len(letra_bin)):
+      time.sleep(0.5)
       client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
-      #print(result)
-      palavra_ant = palavra
+      client.loop_stop()
+      client.loop_start()
+    enable_bin = np.binary_repr(enable,3)
+    time.sleep(1)
+    for j in range(len(enable_bin)):
+      client.publish(user+"/S" + str(j+5), payload=enable_bin[len(enable_bin) - j + 4], qos=0, retain=False)
+      time.sleep(0.00075)
+      client.loop_stop()
+      client.loop_start()
+    enable += 1
+  for j in range(len(enable_bin)):
+      client.publish(user+"/S" + str(j+5), payload=0, qos=0, retain=False)
+      time.sleep(0.00075)
       client.loop_stop()
       client.loop_start()
 
@@ -41,8 +57,8 @@ def on_message(client, userdata, msg):
   palavra = str(msg.payload.decode("utf-8"))
   print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
 
-  if str(msg.topic) == user+"/E0":
-    print("Recebi uma mensagem de E0")
+  if str(msg.topic) == user+"/E1":
+    print("Recebi uma mensagem de E1")
   elif str(msg.topic) == user+"/E1":
     print("Recebi uma mensagem de E1")
   else:
@@ -68,16 +84,16 @@ palavra_ant = palavra
 time.sleep(1)
 while True:
   if palavra_ant != palavra:
-    tem_jogada = "1"
     publish_word(palavra)
-    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
-    time.sleep(0.00075)
+    tem_jogada = "1"
+    client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
+    time.sleep(0.00075) #3/4 de ciclo de clock
     tem_jogada = "0"
-    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
+    client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
     time.sleep(1)
   elif tem_jogada == "1":
     tem_jogada = "0"
-    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
+    client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
     time.sleep(1)
 client.loop_stop()
 

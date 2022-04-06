@@ -28,15 +28,16 @@ architecture tb of testbench_2 is
     -- Componente a ser testado (Device Under Test -- DUT)
     component circuito_projeto
 	PORT (
+		indice_letra: in std_logic_vector(2 downto 0);
 		clock        : IN std_logic;
 		reset        : IN std_logic;
 		iniciar      : IN std_logic;
 		tem_jogada   : IN std_logic;
-		jogada       : IN std_logic_vector(24 DOWNTO 0);
+		letra_jogada       : IN std_logic_vector(4 DOWNTO 0);
 		leds_rgb     : OUT std_logic_vector(9 DOWNTO 0);
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
-		db_contagem  : OUT std_logic_vector (6 DOWNTO 0);
-		db_partida   : OUT std_logic_vector (6 DOWNTO 0);
+		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
+		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
 		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
@@ -49,7 +50,8 @@ architecture tb of testbench_2 is
     signal rst_in           : std_logic := '0';
     signal iniciar_in       : std_logic := '0';
     signal tem_jogada_in    : std_logic := '0';
-    signal jogada_in           : std_logic_vector(24 downto 0) := "0000000000000000000000000";
+    signal indice_letra_in  : std_logic_vector(2 downto 0) := "000";
+    signal letra_jogada_in  : std_logic_vector(4 downto 0) := "00000";
     
     ---- Declaracao dos sinais de saida
     signal leds_rgb_out     : std_logic_vector(9 downto 0) := "0000000000";
@@ -101,11 +103,12 @@ begin
     dut: circuito_projeto
 	port map
      (
+        indice_letra => indice_letra_in,
 		clock        => clk_in,
 		reset        => rst_in,
 		iniciar      => iniciar_in,
 		tem_jogada   => tem_jogada_in,
-		jogada       => jogada_in,
+		letra_jogada => letra_jogada_in,
 		leds_rgb     => leds_rgb_out,
 		db_estado    => estado_out,
 		db_contagem  => contagem_out, 
@@ -145,36 +148,94 @@ begin
         -- espera antes da rodada
         wait for 1 sec;
         ---- jogada #1 (ERRADA)
-        jogada_in <= "0001000010000100001000001";
-        tem_jogada_in <= '1';
+        
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "101";
         -- espera entre jogadas
-        wait for 0.75*clockPeriod;
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
         tem_jogada_in <= '0';
-        wait for 9.25*clockPeriod;
+        wait for 9*clockPeriod;
 
-        ---- jogada #2 (ERRADA)
-        jogada_in <= "0000100010000010000100001";
-        tem_jogada_in <= '1';
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "101";
         -- espera entre jogadas
-        wait for 0.75*clockPeriod;
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
         tem_jogada_in <= '0';
-        wait for 9.25*clockPeriod;
+        wait for 9*clockPeriod;
 
-        ---- jogada #3 (ERRADA)
-        jogada_in <= "0000100010000110001100011";
-        tem_jogada_in <= '1';
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "101";
         -- espera entre jogadas
-        wait for 0.75*clockPeriod;
-        tem_jogada_in <= '0';
-        wait for 9.25*clockPeriod;
-
-        ---- jogada #4 (CERTA)
-        jogada_in <= "0000100010000110010000101";
+        wait for 1*clockPeriod;
         tem_jogada_in <= '1';
-        -- espera entre jogadas
-        wait for 0.75*clockPeriod;
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
         tem_jogada_in <= '0';
-        wait for 9.25*clockPeriod;
+        wait for 9*clockPeriod;
+        
+        letra_jogada_in <= "00001";
+        indice_letra_in <= "001";
+        wait for 1*clockPeriod; 
+        letra_jogada_in <= "00010";
+        indice_letra_in <= "010";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00011";
+        indice_letra_in <= "011";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00100";
+        indice_letra_in <= "100";
+        wait for 1*clockPeriod;
+        letra_jogada_in <= "00101";
+        indice_letra_in <= "101";
+        -- espera entre jogadas
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '1';
+        indice_letra_in <= "000";
+        wait for 1*clockPeriod;
+        tem_jogada_in <= '0';
+        wait for 9*clockPeriod;
 	
         -- espera depois da jogada final
         wait for 20*clockPeriod;  

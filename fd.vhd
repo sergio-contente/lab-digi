@@ -5,12 +5,13 @@ use IEEE.MATH_REAL.ALL;
 
 entity fluxo_dados is
   port (
+  indice_letra: in std_logic_vector(2 downto 0);
   clock : in std_logic;
   reset : in std_logic;
   reset_timer : in std_logic;
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
-  jogada : in std_logic_vector(24 downto 0);
+  letra_jogada : in std_logic_vector(4 downto 0);
   fim_tentativas : out std_logic;
 	jogada_igual_senha : out std_logic;
   incrementa_contagem : in std_logic;
@@ -36,6 +37,11 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   signal letra_jogada_3 : STD_LOGIC_VECTOR (4 downto 0);
   signal letra_jogada_4 : STD_LOGIC_VECTOR (4 downto 0);
   signal letra_jogada_5 : STD_LOGIC_VECTOR (4 DOWNTO 0);
+  signal s_en_letra1 : std_logic;
+  signal s_en_letra2 : std_logic;
+  signal s_en_letra3 : std_logic;
+  signal s_en_letra4 : std_logic;
+  signal s_en_letra5 : std_logic;
 
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -44,6 +50,17 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_contagem : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL s_jogada : STD_LOGIC_VECTOR (24 DOWNTO 0);
   SIGNAL s_dado : STD_LOGIC_VECTOR (3 DOWNTO 0);
+
+  component registrador_5 is
+    port (
+        clock : in  std_logic;
+        clear : in  std_logic;
+        en1   : in  std_logic;
+        en2   : in  std_logic;
+        D     : in  std_logic_vector (4 downto 0);
+        Q     : out std_logic_vector (4 downto 0)
+   );
+  end component;
 
   component ram_16x25 is
     port (       
@@ -124,6 +141,7 @@ component comparador_igualdade is
 end component;
 
 BEGIN
+
   regs: for i in 0 to 24 generate
     comparadores: comparador_igualdade port map(
       jogada_in => vec_jogadas(i),
@@ -153,6 +171,7 @@ BEGIN
     end loop ; -- identifier
   end process ; -- identifier
 
+  
   contador_partida : contador_163
   PORT MAP(
     clock => clock, 
@@ -163,23 +182,75 @@ BEGIN
     D     => "0000",
     Q     => s_endereco, 
     RCO   => open
-  );
+    );
 
-  reg_ultima_jogada : registrador_25
-  PORT MAP(
-    clock => clock,
-    clear => clr_jogada,
-    en1 => en_reg_jogada,
-    en2 => en_reg_jogada,
-    D => jogada,
-    Q => s_jogada
-  );
+    s_en_letra1 <= (indice_letra(0) and (not indice_letra(1)) and (not indice_letra(2)));
+    s_en_letra2 <= ((not indice_letra(0)) and (indice_letra(1)) and (not indice_letra(2)));
+    s_en_letra3 <= ((indice_letra(0)) and (indice_letra(1)) and (not indice_letra(2)));
+    s_en_letra4 <= ((not indice_letra(0)) and (not indice_letra(1)) and (indice_letra(2)));
+    s_en_letra5 <= ((indice_letra(0)) and (not indice_letra(1)) and (indice_letra(2)));
 
-  letra_jogada_1 <= s_jogada(4 downto 0);
-  letra_jogada_2 <= s_jogada(9 downto 5);
+    registradores_intermediarios1: registrador_5
+    PORT MAP (
+      clock  => clock,
+      clear => reset,
+      en1   => s_en_letra1,
+      en2   => s_en_letra1,
+      D     => letra_jogada,
+      Q     => s_jogada(4 downto 0)
+    );
+    registradores_intermediarios2: registrador_5
+    PORT MAP (
+      clock  => clock,
+      clear => reset,
+      en1   => s_en_letra2,
+      en2   => s_en_letra2,
+      D     => letra_jogada,
+      Q     => s_jogada(9 downto 5)
+    );
+    registradores_intermediarios3: registrador_5
+    PORT MAP (
+      clock  => clock,
+      clear => reset,
+      en1   => s_en_letra3,
+      en2   => s_en_letra3,
+      D     => letra_jogada,
+      Q     => s_jogada(14 downto 10)
+    );
+    registradores_intermediarios4: registrador_5
+    PORT MAP (
+      clock  => clock,
+      clear => reset,
+      en1   => s_en_letra4,
+      en2   => s_en_letra4,
+      D     => letra_jogada,
+      Q     => s_jogada(19 downto 15)
+    );
+    registradores_intermediarios5: registrador_5
+    PORT MAP (
+      clock  => clock,
+      clear => reset,
+      en1   => s_en_letra5,
+      en2   => s_en_letra5,
+      D     => letra_jogada,
+      Q     => s_jogada(24 downto 20)
+    );
+    
+  -- reg_ultima_jogada : registrador_25
+  -- PORT MAP(
+  --   clock => clock,
+  --   clear => clr_jogada,
+  --   en1 => en_reg_jogada,
+  --   en2 => en_reg_jogada,
+  --   D => jogada,
+  --   Q => s_jogada
+  -- );
+
+  letra_jogada_5 <= s_jogada(4 downto 0);
+  letra_jogada_4 <= s_jogada(9 downto 5);
   letra_jogada_3 <= s_jogada(14 downto 10);
-  letra_jogada_4 <= s_jogada(19 downto 15);
-  letra_jogada_5 <= s_jogada(24 downto 20);
+  letra_jogada_2 <= s_jogada(19 downto 15);
+  letra_jogada_1 <= s_jogada(24 downto 20);
 
   vec_jogadas(0) <= letra_jogada_1;
   vec_jogadas(1) <= letra_jogada_1;

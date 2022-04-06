@@ -3,11 +3,12 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY circuito_projeto IS
 	PORT (
+  	indice_letra: in std_logic_vector(2 downto 0);
 		clock        : IN std_logic;
 		reset        : IN std_logic;
 		iniciar      : IN std_logic;
 		tem_jogada   : IN std_logic;
-		jogada       : IN std_logic_vector(24 DOWNTO 0);
+		letra_jogada       : IN std_logic_vector(4 DOWNTO 0);
 		leds_rgb     : OUT std_logic_vector(9 DOWNTO 0);
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
@@ -22,22 +23,23 @@ END ENTITY;
 ARCHITECTURE arch OF circuito_projeto IS
 	COMPONENT fluxo_dados IS
 		PORT (
-			clock               : IN std_logic;
-			reset               : IN std_logic;
-			reset_timer         : IN std_logic;
-			enable_timer        : IN std_logic;
-			reset_contagem      : IN std_logic;
-			jogada              : IN std_logic_vector(24 DOWNTO 0);
-			fim_tentativas      : OUT std_logic;
-			jogada_igual_senha  : OUT std_logic;
-			incrementa_contagem : IN std_logic;
-			incrementa_partida  : IN std_logic;
-			clr_jogada          : IN std_logic;
-			en_reg_jogada       : IN std_logic;
-			tempo_jogada        : OUT std_logic_vector(26 DOWNTO 0);
-			db_contagem         : OUT std_logic_vector (2 DOWNTO 0);
-			db_partida          : OUT std_logic_vector (3 DOWNTO 0);
-			leds                : OUT std_logic_vector (9 DOWNTO 0)
+			indice_letra  : in std_logic_vector(2 downto 0);
+			clock : in std_logic;
+			reset : in std_logic;
+			reset_timer : in std_logic;
+			enable_timer : in std_logic;
+			reset_contagem : in std_logic;
+			letra_jogada : in std_logic_vector(4 downto 0);
+			fim_tentativas : out std_logic;
+			jogada_igual_senha : out std_logic;
+			incrementa_contagem : in std_logic;
+			incrementa_partida : in std_logic;
+			clr_jogada : in std_logic;
+			en_reg_jogada : in std_logic;
+			tempo_jogada : out std_logic_vector(26 downto 0);
+			db_contagem : out std_logic_vector(2 downto 0);
+			db_partida : out std_logic_vector(3 downto 0);
+			leds: out std_logic_vector (9 downto 0)   
 		);
 	END COMPONENT;
 
@@ -106,12 +108,13 @@ BEGIN
 
 	fd : fluxo_dados
 	PORT MAP(
-		clock => not_clock,
+		indice_letra => indice_letra,
+		clock => clock,
 		reset => reset,
 		reset_timer => reset_timer,
 		enable_timer => enable_timer,
 		reset_contagem => reset_contagem,
-		jogada => jogada,
+		letra_jogada => letra_jogada,
 		fim_tentativas => fim_tentativas,
 		jogada_igual_senha => jogada_igual_senha,
 		incrementa_contagem => incrementa_contagem,
@@ -126,7 +129,7 @@ BEGIN
 
 	uc : unidade_controle
 	PORT MAP(
-		clock => clock,
+		clock => not_clock,
 		reset => reset,
 		iniciar => iniciar,
 		fim_tentativas => fim_tentativas,
