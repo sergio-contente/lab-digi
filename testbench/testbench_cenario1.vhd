@@ -38,7 +38,6 @@ architecture tb of testbench_2 is
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
-		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
 		perdeu       : OUT std_logic
@@ -58,7 +57,6 @@ architecture tb of testbench_2 is
     signal pronto_out       : std_logic := '0';
     signal ganhou_out       : std_logic := '0';
     signal perdeu_out       : std_logic := '0';
-    signal tempo_jogada_out : std_logic_vector(26 DOWNTO 0) := "000000000000000000000000000";
     
     ---- Declaracao das saidas de depuracao
     -- inserir saidas de depuracao do seu projeto
@@ -112,8 +110,7 @@ begin
 		leds_rgb     => leds_rgb_out,
 		db_estado    => estado_out,
 		db_contagem  => contagem_out, 
-		db_partida   => partida_out,
-		tempo_jogada => tempo_jogada_out, 
+		db_partida   => partida_out, 
 		pronto       => pronto_out,
 		ganhou       => ganhou_out,
 		perdeu       => perdeu_out

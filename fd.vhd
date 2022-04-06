@@ -18,7 +18,6 @@ entity fluxo_dados is
   incrementa_partida : in std_logic;
   clr_jogada : in std_logic;
   en_reg_jogada : in std_logic;
-  tempo_jogada : out std_logic_vector(26 downto 0);
   db_contagem : out std_logic_vector(2 downto 0);
   db_partida : out std_logic_vector(3 downto 0);
   leds: out std_logic_vector (9 downto 0)
