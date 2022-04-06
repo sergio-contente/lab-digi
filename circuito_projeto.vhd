@@ -13,7 +13,6 @@ ENTITY circuito_projeto IS
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
-		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
 		perdeu       : OUT std_logic
@@ -36,7 +35,6 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_partida : in std_logic;
 			clr_jogada : in std_logic;
 			en_reg_jogada : in std_logic;
-			tempo_jogada : out std_logic_vector(26 downto 0);
 			db_contagem : out std_logic_vector(2 downto 0);
 			db_partida : out std_logic_vector(3 downto 0);
 			leds: out std_logic_vector (9 downto 0)   
@@ -81,7 +79,6 @@ ARCHITECTURE arch OF circuito_projeto IS
 
 	SIGNAL 
 	  not_clock, fim_tentativas, jogada_igual_senha, reset_timer, enable_timer, reset_contagem, incrementa_contagem, incrementa_partida, clr_jogada, en_reg_jogada : STD_LOGIC;
-	SIGNAL s_tempo_jogada: STD_LOGIC_VECTOR(26 downto 0);
 	signal s_db_contagem : std_logic_vector(3 downto 0);
 	signal s_db_partida, s_db_estado : std_logic_vector(3 downto 0);
 
@@ -121,7 +118,6 @@ BEGIN
 		incrementa_partida => incrementa_partida,
 		clr_jogada => clr_jogada,
 		en_reg_jogada => en_reg_jogada,
-		tempo_jogada => s_tempo_jogada,
 		db_contagem => s_db_contagem(2 downto 0),
 		db_partida => s_db_partida,
 		leds => leds_rgb

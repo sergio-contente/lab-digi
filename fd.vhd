@@ -313,17 +313,6 @@ BEGIN
     ce => '0',
     dado_saida => s_senha
   );
-  
-  timer: contador_m
-  PORT MAP(
-		clock   => clock,
-    zera_as => reset_timer,
-    zera_s  => '0',
-    conta   => enable_timer,
-    Q       => tempo_jogada,
-    fim     => open,
-    meio    => open
-  );
 
   conta_jogada: contador_6
   PORT MAP(
