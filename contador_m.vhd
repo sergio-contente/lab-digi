@@ -38,7 +38,7 @@ entity contador_m is
         zera_as : in  std_logic;
         zera_s  : in  std_logic;
         conta   : in  std_logic;
-        Q       : out std_logic_vector(natural(ceil(log2(real(M))))-1 downto 0);
+        Q       : out std_logic_vector(26 downto 0);
         fim     : out std_logic;
         meio    : out std_logic
     );

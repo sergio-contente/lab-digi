@@ -31,7 +31,7 @@ begin
     process (clock, clear)
     begin
         if clear='1' then
-            Q <= others => '0';  
+            Q <= (others => '0');  
         elsif clock'event and clock='1' then
             if en1='1' and en2='1'then 
                 Q <= D;

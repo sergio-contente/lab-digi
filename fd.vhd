@@ -10,7 +10,7 @@ entity fluxo_dados is
   reset_timer : in std_logic;
 	enable_timer : in std_logic;
 	reset_contagem : in std_logic;
-  jogada:  in std_logic_vector(24 downto 0);
+  jogada : in std_logic_vector(24 downto 0);
   fim_tentativas : out std_logic;
 	jogada_igual_senha : out std_logic;
   incrementa_contagem : in std_logic;
@@ -18,9 +18,8 @@ entity fluxo_dados is
   clr_jogada : in std_logic;
   en_reg_jogada : in std_logic;
   tempo_jogada : out std_logic_vector(26 downto 0);
-  timeout : out std_logic;
-  db_contagem : out std_logic_vector (2 downto 0);
-  db_partida : out std_logic_vector (3 downto 0);
+  db_contagem : out std_logic_vector(2 downto 0);
+  db_partida : out std_logic_vector(3 downto 0);
   leds: out std_logic_vector (9 downto 0)
   );
  end entity;
@@ -40,7 +39,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
 
   SIGNAL s_endereco : STD_LOGIC_VECTOR (3 DOWNTO 0);
   SIGNAL s_sequencia : STD_LOGIC_VECTOR (3 DOWNTO 0);
-  SIGNAL s_senha: STD_LOGIC_VECTOR (0 to 24);
+  SIGNAL s_senha: STD_LOGIC_VECTOR (24 downto 0);
   SIGNAL vetor_zero: STD_LOGIC_VECTOR (24 DOWNTO 0);
   SIGNAL s_contagem : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL s_jogada : STD_LOGIC_VECTOR (24 DOWNTO 0);
@@ -101,15 +100,6 @@ ARCHITECTURE estrutural OF fluxo_dados IS
    );
   end component;
 
-  component edge_detector is
-    port (
-        clock  : in  std_logic;
-        reset  : in  std_logic;
-        sinal  : in  std_logic;
-        pulso  : out std_logic
-    );
-  end component;
-
   component contador_m is
     generic (
         constant M: integer := 100 -- modulo do contador
@@ -143,7 +133,6 @@ BEGIN
   end generate;
 					
   vetor_zero <= (others => '0');
-  db_jogada <= s_jogada;
   db_contagem <= s_contagem;
 
   jogada_igual_senha <= '1' when (vec_saidas(0) = '1' and vec_saidas(6) = '1' and vec_saidas(12) = '1' and vec_saidas(18) = '1' and vec_saidas(24) = '1') else
@@ -154,16 +143,16 @@ BEGIN
   begin
     assign_colors : for i in 0 to 4 loop
       if vec_saidas(5*i + 4 downto 5*i) = "00000" then
-        leds(i + 1 downto i) <= "10"; -- vermelho
+        leds(2*i + 1 downto 2*i) <= "10"; -- vermelho
       elsif vec_saidas(6*i) = '1' then
-        leds(i + 1 downto i) <= "00"; -- verde
+        leds(2*i + 1 downto 2*i) <= "00"; -- verde
       else
-        leds(i + 1 downto i) <= "01"; -- amarelo
+        leds(2*i + 1 downto 2*i) <= "01"; -- amarelo
       end if;
     end loop ; -- identifier
   end process ; -- identifier
 
-  coleds_colors : contador_163
+  contador_partida : contador_163
   PORT MAP(
     clock => clock, 
     clr   => reset, 
@@ -217,34 +206,34 @@ BEGIN
   vec_jogadas(23) <= letra_jogada_5;
   vec_jogadas(24) <= letra_jogada_5;
 
-  vec_senhas(0)  <=  s_senha(0 to 4);    
-  vec_senhas(1)  <=  s_senha(5 to 9);   
-  vec_senhas(2)  <=  s_senha(10 to 14);  
-  vec_senhas(3)  <=  s_senha(15 to 19);  
-  vec_senhas(4)  <=  s_senha(20 to 24);  
-  vec_senhas(5)  <=  s_senha(0 to 4);    
-  vec_senhas(6)  <=  s_senha(5 to 9);    
-  vec_senhas(7)  <=  s_senha(10 to 14);  
-  vec_senhas(8)  <=  s_senha(15 to 19);  
-  vec_senhas(9)  <=  s_senha(20 to 24);  
-  vec_senhas(10) <=  s_senha(0 to 4);    
-  vec_senhas(11) <=  s_senha(5 to 9);    
-  vec_senhas(12) <=  s_senha(10 to 14);  
-  vec_senhas(13) <=  s_senha(15 to 19);  
-  vec_senhas(14) <=  s_senha(20 to 24);  
-  vec_senhas(15) <=  s_senha(0 to 4);    
-  vec_senhas(16) <=  s_senha(5 to 9);    
-  vec_senhas(17) <=  s_senha(10 to 14);  
-  vec_senhas(18) <=  s_senha(15 to 19);  
-  vec_senhas(19) <=  s_senha(20 to 24);  
-  vec_senhas(20) <=  s_senha(0 to 4);    
-  vec_senhas(21) <=  s_senha(5 to 9);    
-  vec_senhas(22) <=  s_senha(10 to 14);  
-  vec_senhas(23) <=  s_senha(15 to 19);  
-  vec_senhas(24) <=  s_senha(20 to 24);  
+  vec_senhas(0)  <=  s_senha(4 downto 0);    
+  vec_senhas(1)  <=  s_senha(9 downto 5);   
+  vec_senhas(2)  <=  s_senha(14 downto 10);  
+  vec_senhas(3)  <=  s_senha(19 downto 15);  
+  vec_senhas(4)  <=  s_senha(24 downto 20);  
+  vec_senhas(5)  <=  s_senha(4 downto 0);    
+  vec_senhas(6)  <=  s_senha(9 downto 5);    
+  vec_senhas(7)  <=  s_senha(14 downto 10);  
+  vec_senhas(8)  <=  s_senha(19 downto 15);  
+  vec_senhas(9)  <=  s_senha(24 downto 20);  
+  vec_senhas(10) <=  s_senha(4 downto 0);    
+  vec_senhas(11) <=  s_senha(9 downto 5);    
+  vec_senhas(12) <=  s_senha(14 downto 10);  
+  vec_senhas(13) <=  s_senha(19 downto 15);  
+  vec_senhas(14) <=  s_senha(24 downto 20);  
+  vec_senhas(15) <=  s_senha(4 downto 0);    
+  vec_senhas(16) <=  s_senha(9 downto 5);    
+  vec_senhas(17) <=  s_senha(14 downto 10);  
+  vec_senhas(18) <=  s_senha(19 downto 15);  
+  vec_senhas(19) <=  s_senha(24 downto 20);  
+  vec_senhas(20) <=  s_senha(4 downto 0);    
+  vec_senhas(21) <=  s_senha(9 downto 5);    
+  vec_senhas(22) <=  s_senha(14 downto 10);  
+  vec_senhas(23) <=  s_senha(19 downto 15);  
+  vec_senhas(24) <=  s_senha(24 downto 20);  
 
-  memoria: ram_16x25  -- usar para Quartus
-  --memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
+  --memoria : ram_16x25  -- usar para Quartus
+  memoria : entity work.ram_16x25(ram_modelsim) -- usar para ModelSim
   PORT MAP(
     clk => clock,
     endereco => s_endereco,
@@ -261,7 +250,7 @@ BEGIN
     zera_s  => '0',
     conta   => enable_timer,
     Q       => tempo_jogada,
-    fim     => timeout,
+    fim     => open,
     meio    => open
   );
 

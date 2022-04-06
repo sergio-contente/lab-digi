@@ -1,174 +1,147 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
-ENTITY circuito_exp5 IS
+ENTITY circuito_projeto IS
 	PORT (
-		clock : in std_logic;
-		reset : in std_logic;
-		iniciar : in std_logic;
-		botoes  : in  std_logic_vector(3 downto 0);          
-		leds    : out std_logic_vector(3 downto 0);         
-		pronto  : out std_logic;         
-		ganhou  : out std_logic;         
-		perdeu  : out std_logic;
-		db_clock : out std_logic;
-		db_tem_jogada : out std_logic;
-		db_chavesIgualMemoria : out std_logic;
-		db_enderecoIgualSequencia: out std_logic;
-		db_fimS : out std_logic;
-		db_contagem : out std_logic_vector (6 downto 0);
-		db_memoria : out std_logic_vector (6 downto 0);
-		db_estado : out std_logic_vector (6 downto 0);
-		db_jogadafeita : out std_logic_vector (6 downto 0);
-		db_sequencia : out std_logic_vector (6 downto 0)
+		clock        : IN std_logic;
+		reset        : IN std_logic;
+		iniciar      : IN std_logic;
+		tem_jogada   : IN std_logic;
+		jogada       : IN std_logic_vector(24 DOWNTO 0);
+		leds_rgb     : OUT std_logic_vector(9 DOWNTO 0);
+		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
+		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
+		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
+		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
+		pronto       : OUT std_logic;
+		ganhou       : OUT std_logic;
+		perdeu       : OUT std_logic
 	);
 END ENTITY;
 
-ARCHITECTURE arch_exp5 OF circuito_exp5 IS
+ARCHITECTURE arch OF circuito_projeto IS
 	COMPONENT fluxo_dados IS
-	port (
-		clock : in std_logic;
-		reset : in std_logic;
-		reset_timer : in std_logic;
-		  enable_timer : in std_logic;
-		  reset_contagem : in std_logic;
-		jogada:  in std_logic_vector(24 downto 0);
-		fim_tentativas : out std_logic;
-		  jogada_igual_senha : out std_logic;
-		incrementa_contagem : in std_logic;
-		incrementa_partida : in std_logic;
-		clr_jogada : in std_logic;
-		en_reg_jogada : in std_logic;
-		tempo_jogada : out std_logic_vector(26 downto 0);
-		timeout : out std_logic;
-		db_contagem : out std_logic_vector (2 downto 0);
-		db_partida : out std_logic_vector (3 downto 0);
-		leds: out std_logic_vector (9 downto 0)
+		PORT (
+			clock               : IN std_logic;
+			reset               : IN std_logic;
+			reset_timer         : IN std_logic;
+			enable_timer        : IN std_logic;
+			reset_contagem      : IN std_logic;
+			jogada              : IN std_logic_vector(24 DOWNTO 0);
+			fim_tentativas      : OUT std_logic;
+			jogada_igual_senha  : OUT std_logic;
+			incrementa_contagem : IN std_logic;
+			incrementa_partida  : IN std_logic;
+			clr_jogada          : IN std_logic;
+			en_reg_jogada       : IN std_logic;
+			tempo_jogada        : OUT std_logic_vector(26 DOWNTO 0);
+			db_contagem         : OUT std_logic_vector (2 DOWNTO 0);
+			db_partida          : OUT std_logic_vector (3 DOWNTO 0);
+			leds                : OUT std_logic_vector (9 DOWNTO 0)
 		);
 	END COMPONENT;
 
-	COMPONENT hexa7seg
-		PORT (
-			hexa : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			sseg : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
-		);
-	END COMPONENT;
+	-- COMPONENT hexa7seg
+	-- PORT (
+	-- hexa : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+	-- sseg : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+	-- );
+	-- END COMPONENT;
 
 	COMPONENT unidade_controle IS
 		PORT (
-			clock : in std_logic;
-			reset : in std_logic;
-			iniciar : in std_logic;
-			fimE : in std_logic;
-			fimS : in std_logic;
-			fimTMR : in std_logic;
-			igualJ : in std_logic;
-			igualS : in std_logic;
-			jogada : in std_logic;
-			contaE : out std_logic;
-			contaS : out std_logic;
-			contaTMR : out std_logic;
-			ganhou : out std_logic;
-			limpaM : out std_logic;
-			limpaR : out std_logic;
-			perdeu : out std_logic;
-			pronto : out std_logic;
-			registraM : out std_logic;
-			registraR : out std_logic;
-			zeraE : out std_logic;
-			zeraS : out std_logic;
-			zeraTMR : out std_logic;
-			db_estado : out std_logic_vector(3 downto 0)
+			clock               : IN std_logic;
+			reset               : IN std_logic;
+			iniciar             : IN std_logic;
+			fim_tentativas      : IN std_logic;
+			tem_jogada          : IN std_logic;
+			jogada_igual_senha  : IN std_logic;
+			reset_timer         : OUT std_logic;
+			enable_timer        : OUT std_logic;
+			reset_contagem      : OUT std_logic;
+			ganhou              : OUT std_logic;
+			perdeu              : OUT std_logic;
+			pronto              : OUT std_logic;
+			incrementa_contagem : OUT std_logic;
+			incrementa_partida  : OUT std_logic;
+			clr_jogada          : OUT std_logic;
+			en_reg_jogada       : OUT std_logic;
+			db_estado           : OUT std_logic_vector(3 DOWNTO 0)
 		);
 	END COMPONENT;
 
-	SIGNAL limpaM, igualS, igualJ, fimS, s_jogadafeita, s_temjogada, not_clock, fimE, zeraC, contaS, contaE, zeraR, zeraS, zeraE, registraR, contaTMR, zeraTMR, limpaR, fimTMR, escreveM, s_igualMemoria, s_igualSequencia, s_menorSequencia : STD_LOGIC;
-	SIGNAL s_jogada, s_contagem, s_memoria, s_sequencia, s_estado : STD_LOGIC_VECTOR (3 DOWNTO 0);
+	component hexa7seg is
+    port (
+        hexa   : in  std_logic_vector(3 downto 0);
+        sseg   : out std_logic_vector(6 downto 0)
+    );
+	end component;
+
+	SIGNAL 
+	  not_clock, fim_tentativas, jogada_igual_senha, reset_timer, enable_timer, reset_contagem, incrementa_contagem, incrementa_partida, clr_jogada, en_reg_jogada : STD_LOGIC;
+	SIGNAL s_tempo_jogada: STD_LOGIC_VECTOR(26 downto 0);
+	signal s_db_contagem : std_logic_vector(3 downto 0);
+	signal s_db_partida, s_db_estado : std_logic_vector(3 downto 0);
 
 BEGIN
-	HEXA0 : hexa7seg
-	PORT MAP(
-		s_contagem, db_contagem
+	s_db_contagem(3) <= '0';
+
+	display_contagem : hexa7seg
+	port map(
+        hexa => s_db_contagem,
+        sseg => db_contagem
+	);
+	display_partida : hexa7seg
+	port map(
+        hexa => s_db_partida,
+        sseg => db_partida
+	);
+	display_estado : hexa7seg
+	port map(
+        hexa => s_db_estado,
+        sseg => db_estado
 	);
 
-	HEXA1 : hexa7seg
+	not_clock <= (NOT clock);
+
+	fd : fluxo_dados
 	PORT MAP(
-		s_memoria, db_memoria
+		clock => not_clock,
+		reset => reset,
+		reset_timer => reset_timer,
+		enable_timer => enable_timer,
+		reset_contagem => reset_contagem,
+		jogada => jogada,
+		fim_tentativas => fim_tentativas,
+		jogada_igual_senha => jogada_igual_senha,
+		incrementa_contagem => incrementa_contagem,
+		incrementa_partida => incrementa_partida,
+		clr_jogada => clr_jogada,
+		en_reg_jogada => en_reg_jogada,
+		tempo_jogada => s_tempo_jogada,
+		db_contagem => s_db_contagem(2 downto 0),
+		db_partida => s_db_partida,
+		leds => leds_rgb
 	);
 
-	HEXA2 : hexa7seg
+	uc : unidade_controle
 	PORT MAP(
-		s_jogada, db_jogadafeita
+		clock => clock,
+		reset => reset,
+		iniciar => iniciar,
+		fim_tentativas => fim_tentativas,
+		tem_jogada => tem_jogada,
+		jogada_igual_senha => jogada_igual_senha,
+		reset_timer => reset_timer,
+		enable_timer => enable_timer,
+		reset_contagem => reset_contagem,
+		ganhou => ganhou,
+		perdeu => perdeu,
+		pronto => pronto, 
+		incrementa_contagem => incrementa_contagem,
+		incrementa_partida => incrementa_partida,
+		clr_jogada => clr_jogada,
+		en_reg_jogada => en_reg_jogada,
+		db_estado => s_db_estado
 	);
-
-	HEXA3 : hexa7seg
-	PORT MAP(
-		s_sequencia, db_sequencia
-	);
-	HEXA4 : hexa7seg
-	PORT MAP(
-		s_estado, db_estado
-	);
-
-	not_clock <= NOT clock;
-	db_chavesIgualMemoria <= s_igualMemoria;
-	db_enderecoIgualSequencia <= s_igualSequencia;
-	db_tem_jogada <= s_temjogada;
-	db_clock <= clock;
-	db_fimS <= fimS;
-	leds <= s_memoria;
-
-	fd: fluxo_dados
-		PORT MAP(
-			clock => not_clock,
-			contaS => contaS,
-			zeraS => zeraS,
-			contaE => contaE,
-			zeraE => zeraE,
-			registraR => registraR,
-			botoes => botoes,
-			limpaR => limpaR,
-			limpaM => limpaM,
-			contaTMR => contaTMR,
-			zeraTMR => zeraTMR,
-			escreveM => escreveM,
-			chavesIgualMemoria => s_igualMemoria,
-			enderecoMenorOuIgualSequencia => s_menorSequencia,
-			enderecoIgualSequencia => s_igualSequencia,
-			fimS	=> fimS,
-			fimE  	=> fimE,
-			fimTMR 	=> fimTMR,
-			jogada_feita => s_jogadafeita,
-			db_tem_jogada => s_temjogada,
-			db_contagem => s_contagem,
-			db_memoria => s_memoria,
-			db_jogada => s_jogada,
-			db_sequencia => s_sequencia
-		);
-	uc: unidade_controle
-		PORT MAP(
-			clock => clock,
-			reset => reset,
-			iniciar => iniciar,
-			fimE => fimE,
-			fimS => fimS,
-			fimTMR => fimTMR,
-			igualJ => s_igualMemoria,
-			igualS => s_igualSequencia,
-			jogada => s_jogadafeita,
-			contaE => contaE,
-			contaS => contaS,
-			contaTMR => contaTMR,
-			ganhou => ganhou,
-			limpaM => limpaM,
-			limpaR => limpaR,
-			perdeu => perdeu,
-			pronto => pronto,
-			registraM => escreveM,
-			registraR => registraR,
-			zeraE => zeraE,
-			zeraS => zeraS,
-			zeraTMR => zeraTMR,
-			db_estado => s_estado
-		);
-END arch_exp5;
+END arch;
