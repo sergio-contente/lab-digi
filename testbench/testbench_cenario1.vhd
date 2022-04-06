@@ -20,10 +20,10 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity testbench is
+entity testbench_1 is
 end entity;
 
-architecture tb of testbench is
+architecture tb of testbench_1 is
 
     -- Componente a ser testado (Device Under Test -- DUT)
     component circuito_projeto
@@ -145,7 +145,7 @@ begin
             -- espera antes da rodada
             wait for 1 sec;
             ---- jogada #1 (ERRADA)
-            jogada_in <= "0001000010000100001000001";
+            jogada_in <= "0000100001000100000100001";
             tem_jogada_in <= '1';
             -- espera entre jogadas
             wait for 0.75*clockPeriod;
@@ -153,7 +153,7 @@ begin
             wait for 9.25*clockPeriod;
     
             ---- jogada #2 (ERRADA)
-            jogada_in <= "0000100010000010000100001";
+            jogada_in <= "0000100010001100001100011";
             tem_jogada_in <= '1';
             -- espera entre jogadas
             wait for 0.75*clockPeriod;
@@ -161,7 +161,7 @@ begin
             wait for 9.25*clockPeriod;
     
             ---- jogada #3 (ERRADA)
-            jogada_in <= "0000100010000110001100011";
+            jogada_in <= "0000100010000111100111000";
             tem_jogada_in <= '1';
             -- espera entre jogadas
             wait for 0.75*clockPeriod;
@@ -169,7 +169,7 @@ begin
             wait for 9.25*clockPeriod;
     
             ---- jogada #4 (ERRADA)
-            jogada_in <= "1100100010000110010000101";
+            jogada_in <= "0000100010001100010000001";
             tem_jogada_in <= '1';
             -- espera entre jogadas
             wait for 0.75*clockPeriod;
@@ -177,7 +177,7 @@ begin
             wait for 9.25*clockPeriod;
 
             ---- jogada #5 (ERRADA)
-            jogada_in <= "1100101010100110010000101";
+            jogada_in <= "0000100010001100010000110";
             tem_jogada_in <= '1';
             -- espera entre jogadas
             wait for 0.75*clockPeriod;

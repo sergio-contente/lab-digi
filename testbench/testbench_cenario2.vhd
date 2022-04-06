@@ -20,10 +20,10 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity testbench is
+entity testbench_2 is
 end entity;
 
-architecture tb of testbench is
+architecture tb of testbench_2 is
 
     -- Componente a ser testado (Device Under Test -- DUT)
     component circuito_projeto

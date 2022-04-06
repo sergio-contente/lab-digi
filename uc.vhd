@@ -51,9 +51,9 @@ begin
         preparacao_jogo         when  Eatual=espera and iniciar='1' else
         espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0' and jogada_igual_senha = '0' and fim_tentativas = '0') or (Eatual=espera_jogada and tem_jogada='0') or (Eatual=compara and (fim_tentativas = '0') and (jogada_igual_senha = '0')) else
         compara                 when  Eatual=espera_jogada and tem_jogada = '1' else
-        fim_perdeu              when  Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = '1' else
-        fim_ganhou              when  Eatual=compara and jogada_igual_senha = '1' else
-        espera                  when  Eatual=fim_perdeu or Eatual=fim_ganhou else
+        fim_perdeu              when  (Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = '1') or (Eatual=fim_perdeu and iniciar = '0') else
+        fim_ganhou              when  (Eatual=compara and jogada_igual_senha = '1') or (Eatual=fim_ganhou and iniciar = '0')else
+        espera                  when  (Eatual=fim_perdeu and iniciar = '1') or (Eatual=fim_ganhou and iniciar = '1') else
         espera;
 
     -- logica de saída (maquina de Moore)
