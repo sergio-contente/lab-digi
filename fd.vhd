@@ -134,6 +134,7 @@ BEGIN
 					
   vetor_zero <= (others => '0');
   db_contagem <= s_contagem;
+  db_partida <= s_endereco;
 
   jogada_igual_senha <= '1' when (vec_saidas(0) = '1' and vec_saidas(6) = '1' and vec_saidas(12) = '1' and vec_saidas(18) = '1' and vec_saidas(24) = '1') else
                         '0';

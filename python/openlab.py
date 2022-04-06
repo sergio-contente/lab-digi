@@ -27,7 +27,7 @@ def publish_word(palavra):
   for letra in palavra:
     letra_bin = get_signal(letra)
     for i in range(len(letra_bin)):
-      (result, mid) = client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
+      client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
       #print(result)
       palavra_ant = palavra
       client.loop_stop()
