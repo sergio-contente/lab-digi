@@ -13,6 +13,7 @@ ENTITY circuito_projeto IS
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
+		tempo_jogada : OUT std_logic_vector(26 DOWNTO 0);
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
 		perdeu       : OUT std_logic
@@ -35,6 +36,7 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_partida : in std_logic;
 			clr_jogada : in std_logic;
 			en_reg_jogada : in std_logic;
+			tempo_jogada : out std_logic_vector(26 downto 0);
 			db_contagem : out std_logic_vector(2 downto 0);
 			db_partida : out std_logic_vector(3 downto 0);
 			leds: out std_logic_vector (9 downto 0)   
