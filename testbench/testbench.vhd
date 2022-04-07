@@ -143,34 +143,38 @@ begin
         ---- jogadas da 5a rodada (erro na 2a jogada)
         rodada_jogo <= 0;
         -- espera antes da rodada
-        wait for 6 sec;
+        wait for 1 sec;
         ---- jogada #1 (ERRADA)
         jogada_in <= "0001000010000100001000001";
         tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod;
+        wait for 0.75*clockPeriod;
         tem_jogada_in <= '0';
+        wait for 9.25*clockPeriod;
 
         ---- jogada #2 (ERRADA)
         jogada_in <= "0000100010000010000100001";
         tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod;
+        wait for 0.75*clockPeriod;
         tem_jogada_in <= '0';
+        wait for 9.25*clockPeriod;
 
         ---- jogada #3 (ERRADA)
         jogada_in <= "0000100010000110001100011";
         tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod;
+        wait for 0.75*clockPeriod;
         tem_jogada_in <= '0';
+        wait for 9.25*clockPeriod;
 
         ---- jogada #4 (CERTA)
         jogada_in <= "0000100010000110010000101";
         tem_jogada_in <= '1';
         -- espera entre jogadas
-        wait for 10*clockPeriod;
+        wait for 0.75*clockPeriod;
         tem_jogada_in <= '0';
+        wait for 9.25*clockPeriod;
 	
         -- espera depois da jogada final
         wait for 20*clockPeriod;  

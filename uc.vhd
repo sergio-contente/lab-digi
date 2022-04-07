@@ -49,7 +49,7 @@ begin
     Eprox <=
         espera                  when  Eatual=espera and iniciar='0' else
         preparacao_jogo         when  Eatual=espera and iniciar='1' else
-        espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0') or (Eatual=compara and (fim_tentativas = '0') and (jogada_igual_senha = '0')) else
+        espera_jogada           when  Eatual=preparacao_jogo or (Eatual=compara and tem_jogada='0' and jogada_igual_senha = '0' and fim_tentativas = '0') or (Eatual=espera_jogada and tem_jogada='0') or (Eatual=compara and (fim_tentativas = '0') and (jogada_igual_senha = '0')) else
         compara                 when  Eatual=espera_jogada and tem_jogada = '1' else
         fim_perdeu              when  Eatual=compara and jogada_igual_senha = '0' and fim_tentativas = '1' else
         fim_ganhou              when  Eatual=compara and jogada_igual_senha = '1' else
@@ -70,6 +70,12 @@ begin
     with Eatual select
         reset_timer <='1' when preparacao_jogo,
                       '0' when others;
+    with Eatual select
+        incrementa_partida <='1' when preparacao_jogo,
+                            '0' when others;
+    with Eatual select
+        incrementa_contagem <='1' when compara,
+                                '0' when others;
     with Eatual select
 	    reset_contagem <='1' when preparacao_jogo,
                          '0' when others;

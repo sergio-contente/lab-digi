@@ -71,11 +71,14 @@ while True:
     tem_jogada = "1"
     publish_word(palavra)
     client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
-    time.sleep(2)
+    time.sleep(0.00075)
+    tem_jogada = "0"
+    client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
+    time.sleep(1)
   elif tem_jogada == "1":
     tem_jogada = "0"
     client.publish(user+"/S5", payload=tem_jogada, qos=0, retain=False)
-    time.sleep(2)
+    time.sleep(1)
 client.loop_stop()
 
 client.disconnect()
