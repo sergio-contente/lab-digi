@@ -3,7 +3,7 @@
 -- Projeto   : Jogo da Senha
 -----------------------------------------------------------------------------------------------------------------------
 
--- Descricao : registrador de 25 bits 
+-- Descricao : registrador de 8 bits 
 --             retorna o valor de input se estiver habilitado
 -----------------------------------------------------------------------------------------------------------------------
 -- Revisoes  :
@@ -14,18 +14,18 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity registrador_5 is
+entity registrador_8 is
     port (
         clock : in  std_logic;
         clear : in  std_logic;
         en1   : in  std_logic;
         en2   : in  std_logic;
-        D     : in  std_logic_vector (4 downto 0);
-        Q     : out std_logic_vector (4 downto 0)
+        D     : in  std_logic_vector (7 downto 0);
+        Q     : out std_logic_vector (7 downto 0)
    );
-end entity registrador_5;
+end entity registrador_8;
 
-architecture comportamental of registrador_5 is
+architecture comportamental of registrador_8 is
 begin
   
     process (clock, clear)

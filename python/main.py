@@ -26,28 +26,27 @@ def publish_word(palavra):
   global palavra_ant
   global enable
   global tem_letra
-  enable = 0
+  enable = 1
   palavra_ant = palavra
   for letra in palavra:
-    letra_bin = get_signal(letra)
-    for i in range(len(letra_bin)):
-      time.sleep(0.5)
-      client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
-      client.loop_stop()
-      client.loop_start()
-    enable_bin = np.binary_repr(enable,3)
-    time.sleep(1)
-    for j in range(len(enable_bin)):
-      client.publish(user+"/S" + str(j+5), payload=enable_bin[len(enable_bin) - j + 4], qos=0, retain=False)
-      time.sleep(0.00075)
-      client.loop_stop()
-      client.loop_start()
-    enable += 1
-  for j in range(len(enable_bin)):
-      client.publish(user+"/S" + str(j+5), payload=0, qos=0, retain=False)
-      time.sleep(0.00075)
-      client.loop_stop()
-      client.loop_start()
+    client.publish(user+"/RX", payload=letra, qos=0)
+    time.sleep(2)
+    # print(enable)
+    # letra_bin = get_signal(letra)
+    # enable_bin = np.binary_repr(enable,3)
+    # print(f'letra: {letra}')
+    # print(f'letra_bin: {letra_bin}')
+    # for i in range(len(letra_bin)):
+    #   if i < 3:
+    #     client.publish(user+"/S" + str(i+5), payload=enable_bin[len(enable_bin) - i - 1], qos=0, retain=False)
+    #   client.publish(user+"/S" + str(i), payload=letra_bin[len(letra_bin) - i - 1], qos=0, retain=False)
+    #   time.sleep(0.00025)
+    #   client.loop_stop()
+    #   client.loop_start()
+    # for j in range(len(enable_bin)):
+    #   client.publish(user+"/S" + str(j+5), payload=0, qos=0, retain=False)
+    #   time.sleep(0.00075)
+    # enable += 1
 
 
 # Quando receber uma mensagem (Callback de mensagem)
