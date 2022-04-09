@@ -8,7 +8,7 @@ ENTITY circuito_projeto IS
 		reset        : IN std_logic;
 		iniciar      : IN std_logic;
 		tem_jogada   : IN std_logic;
-		leds_rgb     : OUT std_logic_vector(9 DOWNTO 0);
+		leds_rgb     : OUT std_logic_vector(4 DOWNTO 0);
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
@@ -33,7 +33,7 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_partida : IN STD_LOGIC;
 			db_contagem : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			db_partida : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-			leds : OUT STD_LOGIC_VECTOR (9 DOWNTO 0);
+			leds : OUT STD_LOGIC_VECTOR (4 DOWNTO 0);
 			incrementa_contagem_registrador_letra : IN STD_LOGIC;
 			reset_letra : IN STD_LOGIC;
 			fim_contador_letras : OUT STD_LOGIC;

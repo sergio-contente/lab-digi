@@ -17,7 +17,7 @@ ENTITY fluxo_dados IS
     incrementa_partida : IN STD_LOGIC;
     db_contagem : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     db_partida : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    leds : OUT STD_LOGIC_VECTOR (9 DOWNTO 0);
+    leds : OUT STD_LOGIC_VECTOR (4 DOWNTO 0);
     incrementa_contagem_registrador_letra : IN STD_LOGIC;
     reset_letra : IN STD_LOGIC;
     fim_contador_letras : OUT STD_LOGIC;
@@ -185,12 +185,15 @@ BEGIN
     VARIABLE pos : INTEGER := 0;
   BEGIN
     assign_colors : FOR i IN 0 TO 4 LOOP
-      IF vec_saidas(5 * i + 4 DOWNTO 5 * i) = "00000" THEN
-        leds(2 * i + 1 DOWNTO 2 * i) <= "10"; -- vermelho
+      IF vec_saidas(5 * i + 4 DOWNTO 5 * i) = "00000000" THEN
+        leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
+		  leds(4 downto 3) <= "10"; -- vermelho
       ELSIF vec_saidas(6 * i) = '1' THEN
-        leds(2 * i + 1 DOWNTO 2 * i) <= "00"; -- verde
+		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
+		  leds(4 downto 3) <= "00"; -- verde
       ELSE
-        leds(2 * i + 1 DOWNTO 2 * i) <= "01"; -- amarelo 
+		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
+		  leds(4 downto 3) <= "01"; -- amarelo
       END IF;
     END LOOP; -- identifier
   END PROCESS; -- identifier

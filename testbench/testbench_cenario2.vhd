@@ -87,7 +87,7 @@ ARCHITECTURE tb OF testbench_2 IS
     SIGNAL keep_simulating : STD_LOGIC := '0'; -- delimita o tempo de geração do clock
     CONSTANT clockPeriod : TIME := 1 ms; -- frequencia 1 KHz
 
-    -----------------------------TESTANDO COMUNICAÇÂO SERIAL----------------------------------------
+    -----------------------------TESTANDO COMUNICACAO SERIAL----------------------------------------
     ------------------------------------------------------------------------------------------------
     CONSTANT baudrate : TIME := 26.925 us; -- 38.400 baud
     PROCEDURE send_midi_byte (
@@ -111,7 +111,7 @@ ARCHITECTURE tb OF testbench_2 IS
     TYPE baud IS (IDLE, START, BD0, BD1, BD2, BD3, BD4, BD5, BD6, BD7, STOP);
     SIGNAL baud_cnt : baud;
     ------------------------------------------------------------------------------------------------
-    -----------------------------TESTANDO COMUNICAÇÂO SERIAL----------------------------------------
+    -----------------------------TESTANDO COMUNICACAO SERIAL----------------------------------------
 BEGIN
     -- Gerador de clock: executa enquanto 'keep_simulating = 1', com o período especificado. 
     -- Quando keep_simulating=0, clock é interrompido, bem como a simulação de eventos
@@ -121,7 +121,7 @@ BEGIN
     dut : circuito_projeto
     PORT MAP
     (
-        entrada_RX => in_entradas_RX,
+        entrada_RX => ntradas_RX_in,
         clock => clk_in,
         reset => rst_in,
         iniciar => iniciar_in,
@@ -135,61 +135,61 @@ BEGIN
         perdeu => perdeu_out
     );
 
-    PROCEDURE_CALL :
-    PROCESS
-    BEGIN
-        WAIT FOR baudrate; -- SHOW IDLE on midi_out;
-        send_midi_byte(letra, fi); -- added second parameter
-        WAIT;
-    END PROCESS;
-    BAUD_CTR :
-    PROCESS
-    BEGIN
-        IF baud_cnt = IDLE THEN
-            WAIT UNTIL midi_out = '0';
-        END IF;
-        LOOP
-            baud_cnt <= baud'RIGHTOF(baud_cnt);
-            WAIT FOR 0 ns;
-            REPORT "baud(" & baud'image(baud_cnt) &
-                ") midi_out = " & STD_ULOGIC'image(midi_out);
-            WAIT FOR baudrate;
-            IF baud_cnt = STOP THEN
-                baud_cnt <= IDLE;
-                EXIT;
-            END IF;
-        END LOOP;
-        WAIT;
-    END PROCESS;
+    -- PROCEDURE_CALL :
+    -- PROCESS
+    -- BEGIN
+    --     WAIT FOR baudrate; -- SHOW IDLE on midi_out;
+    --     send_midi_byte(letra, fi); -- added second parameter
+    --     WAIT;
+    -- END PROCESS;
+    -- BAUD_CTR :
+    -- PROCESS
+    -- BEGIN
+    --     IF baud_cnt = IDLE THEN
+    --         WAIT UNTIL midi_out = '0';
+    --     END IF;
+    --     LOOP
+    --         baud_cnt <= baud'RIGHTOF(baud_cnt);
+    --         WAIT FOR 0 ns;
+    --         REPORT "baud(" & baud'image(baud_cnt) &
+    --             ") midi_out = " & STD_ULOGIC'image(midi_out);
+    --         WAIT FOR baudrate;
+    --         IF baud_cnt = STOP THEN
+    --             baud_cnt <= IDLE;
+    --             EXIT;
+    --         END IF;
+    --     END LOOP;
+    --     WAIT;
+    -- END PROCESS;
 
     ---- Gera sinais de estimulo para a simulacao
 
     -- Cenario de Teste #2: Acerta as primeiras senha na 4 jogada 
-    -- stimulus_2: process is
-    -- begin
+    stimulus_2: process is
+    begin
 
-    --     -- inicio da simulacao
-    --     assert false report "inicio da simulacao" severity note;
-    --     keep_simulating <= '1';
+        -- inicio da simulacao
+        assert false report "inicio da simulacao" severity note;
+        keep_simulating <= '1';
 
-    --     -- gera pulso de reset (1 periodo de clock)
-    --     rst_in <= '1';
-    --     wait for clockPeriod;
-    --     rst_in <= '0';
+        -- gera pulso de reset (1 periodo de clock)
+        rst_in <= '1';
+        wait for clockPeriod;
+        rst_in <= '0';
 
-    --     wait until falling_edge(clk_in);
+        wait until falling_edge(clk_in);
     --     -- pulso do sinal de Iniciar
-    --     iniciar_in <= '1';
-    --     wait until falling_edge(clk_in);
-    --     iniciar_in <= '0';
+        iniciar_in <= '1';
+        wait until falling_edge(clk_in);
+        iniciar_in <= '0';
 
-    --     wait for 10*clockPeriod;
+        wait for 10*clockPeriod;
 
-    --     -- Cenario de Teste 2
-    --     ---- jogadas da 5a rodada (erro na 2a jogada)
-    --     rodada_jogo <= 0;
-    --     -- espera antes da rodada
-    --     wait for 1 sec;
+        -- Cenario de Teste 2
+        ---- jogadas da 5a rodada (erro na 2a jogada)
+        rodada_jogo <= 0;
+        -- espera antes da rodada
+        wait for 1 sec;
     ---- jogada #1 (ERRADA)
 
     -- letra_jogada_in <= "00010";
@@ -283,11 +283,11 @@ BEGIN
     -- espera depois da jogada final
     --     wait for 20*clockPeriod;  
 
-    --     ---- final do testbench
-    --     assert false report "fim da simulacao" severity note;
-    --     keep_simulating <= '0';
+        ---- final do testbench
+        assert false report "fim da simulacao" severity note;
+        keep_simulating <= '0';
 
-    --     wait; -- fim da simulação: processo aguarda indefinidamente
-    -- end process;
+        wait; -- fim da simulação: processo aguarda indefinidamente
+    end process;
 
 END ARCHITECTURE;
