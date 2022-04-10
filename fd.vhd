@@ -185,12 +185,12 @@ BEGIN
     VARIABLE pos : INTEGER := 0;
   BEGIN
     assign_colors : FOR i IN 0 TO 4 LOOP
-      IF vec_saidas(5 * i + 4 DOWNTO 5 * i) = "00000000" THEN
+      IF vec_saidas(5 * i + 4 DOWNTO 5 * i) = "00000" THEN
         leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
 		  leds(4 downto 3) <= "10"; -- vermelho
       ELSIF vec_saidas(6 * i) = '1' THEN
 		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
-		  leds(4 downto 3) <= "00"; -- verde
+		  leds(4 downto 3) <= "11"; -- verde
       ELSE
 		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
 		  leds(4 downto 3) <= "01"; -- amarelo

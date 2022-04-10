@@ -12,6 +12,11 @@ ENTITY circuito_projeto IS
 		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
+		db_clock     : out std_logic;
+	   db_tem_jogada: out std_logic;
+	   db_iniciar   : out std_logic;
+		db_fim_contador_letras : out std_logic;
+		db_fim_rx	 : out std_logic;
 		pronto       : OUT std_logic;
 		ganhou       : OUT std_logic;
 		perdeu       : OUT std_logic
@@ -88,6 +93,12 @@ ARCHITECTURE arch OF circuito_projeto IS
 	signal en_reg_jogada : std_logic;
 BEGIN
 	s_db_contagem(3) <= '0';
+	db_iniciar <= iniciar;
+	db_clock <= clock;
+	db_tem_jogada <= tem_jogada;
+	db_fim_rx <= s_fim_rx;
+	
+	db_fim_contador_letras <= s_fim_contador_letras;
 
 	display_contagem : hexa7seg
 	port map(

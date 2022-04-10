@@ -20,6 +20,8 @@ palavra = ""
 def on_connect(client, userdata, flags, rc):
   print("Conectado com codigo " + str(rc))
   client.subscribe(user+"/E1", qos=0)
+  for i in range(0,8):
+    client.publish(user+"/E" + str(i), payload = "0", qos=0)
 
 def publish_word(palavra):
   print(palavra)
@@ -83,10 +85,10 @@ palavra_ant = palavra
 time.sleep(1)
 while True:
   if palavra_ant != palavra:
-    publish_word(palavra)
     tem_jogada = "1"
     client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
     time.sleep(0.00075) #3/4 de ciclo de clock
+    publish_word(palavra)
     tem_jogada = "0"
     client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
     time.sleep(1)
