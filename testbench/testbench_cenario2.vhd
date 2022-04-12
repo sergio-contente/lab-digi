@@ -33,13 +33,20 @@ ARCHITECTURE tb OF testbench_2 IS
             reset : IN STD_LOGIC;
             iniciar : IN STD_LOGIC;
             tem_jogada : IN STD_LOGIC;
-            leds_rgb : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
+            leds_rgb : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
             db_estado : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             db_contagem : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             db_partida : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            db_clock : OUT STD_LOGIC;
+            db_tem_jogada : OUT STD_LOGIC;
+            db_iniciar : OUT STD_LOGIC;
+            db_fim_contador_letras : OUT STD_LOGIC;
+            db_fim_rx : OUT STD_LOGIC;
             pronto : OUT STD_LOGIC;
             ganhou : OUT STD_LOGIC;
-            perdeu : OUT STD_LOGIC
+            perdeu : OUT STD_LOGIC;
+            teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
+            tem_teste : in std_logic
         );
     END COMPONENT;
 
@@ -48,13 +55,23 @@ ARCHITECTURE tb OF testbench_2 IS
     SIGNAL rst_in : STD_LOGIC := '0';
     SIGNAL iniciar_in : STD_LOGIC := '0';
     SIGNAL tem_jogada_in : STD_LOGIC := '0';
-    SIGNAL entrada_RX_in : STD_LOGIC_VECTOR(4 DOWNTO 0) := '0';
+    SIGNAL entrada_RX_in : STD_LOGIC := '0';
+    SIGNAL teste_fudido_in : STD_LOGIC_VECTOR(39 DOWNTO 0) :="0000000000000000000000000000000000000000";
+    SIGNAL tem_teste_in : std_logic :='0';
 
     ---- Declaracao dos sinais de saida
-    SIGNAL leds_rgb_out : STD_LOGIC_VECTOR(9 DOWNTO 0) := "0000000000";
+    SIGNAL leds_rgb_out : STD_LOGIC_VECTOR(4 DOWNTO 0) := "00000";
     SIGNAL pronto_out : STD_LOGIC := '0';
     SIGNAL ganhou_out : STD_LOGIC := '0';
     SIGNAL perdeu_out : STD_LOGIC := '0';
+    SIGNAL db_estado_out : STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000000";
+    SIGNAL db_contagem_out : STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000000";
+    SIGNAL db_partida_out : STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000000";
+    SIGNAL db_clock_out : STD_LOGIC := '0';
+    SIGNAL db_tem_jogada_out : STD_LOGIC := '0';
+    SIGNAL db_iniciar_out : STD_LOGIC := '0';
+    SIGNAL db_fim_contador_letras_out : STD_LOGIC := '0';
+    SIGNAL db_fim_rx_out : STD_LOGIC := '0';
     ---- Declaracao das saidas de depuracao
     -- inserir saidas de depuracao do seu projeto
     -- exemplos:
@@ -62,22 +79,19 @@ ARCHITECTURE tb OF testbench_2 IS
     -- signal clock_out        : std_logic := '0';
     -- signal clock_out, tem_jogada_out, chavesIgualMemoria_out, enderecoIgualSequencia_out, fimS_out      : std_logic := '0';
     -- signal contagem_out, memoria_out, estado_out, jogada_feita_out, sequencia_out                       : std_logic_vector(6 downto 0):= "0000000";
-    SIGNAL estado_out : STD_LOGIC_VECTOR(6 DOWNTO 0);
-    SIGNAL contagem_out : STD_LOGIC_VECTOR(6 DOWNTO 0);
-    SIGNAL partida_out : STD_LOGIC_VECTOR(6 DOWNTO 0);
 
     -- Array de casos de teste
     TYPE caso_teste_type IS RECORD
         id : NATURAL;
-        jogada_certa : STD_LOGIC_VECTOR(24 DOWNTO 0);
+        jogada_certa : STD_LOGIC_VECTOR(39 DOWNTO 0);
         duracao_jogada : INTEGER;
     END RECORD;
 
     TYPE casos_teste_array IS ARRAY (NATURAL RANGE <>) OF caso_teste_type;
     CONSTANT casos_teste : casos_teste_array :=
     (--  id             jogada_certa             duracao_jogada
-    (0, "0000100010000110010000101", 5),
-    (1, "0000100010000110010000101", 5) -- conteudo da ram_16x4
+    (0, "0110000101100010011000110110010001100101", 5),
+    (1, "0110000101100010011000110110010001100101", 5) -- conteudo da ram_16x4
     );
 
     -- Identificacao de casos de teste
@@ -89,27 +103,27 @@ ARCHITECTURE tb OF testbench_2 IS
 
     -----------------------------TESTANDO COMUNICACAO SERIAL----------------------------------------
     ------------------------------------------------------------------------------------------------
-    CONSTANT baudrate : TIME := 26.925 us; -- 38.400 baud
-    PROCEDURE send_midi_byte (
-        SIGNAL byte_in : IN STD_LOGIC_VECTOR;
-        SIGNAL midi_out : OUT STD_LOGIC
-    ) IS
-        ALIAS in_byte : STD_LOGIC_VECTOR (7 DOWNTO 0) IS byte_in; -- ADDED
-    BEGIN
-        midi_out <= '0';
-        WAIT FOR baudrate;
-        FOR i IN in_byte'RANGE LOOP -- WAS 7 to 0
-            midi_out <= in_byte(i); -- WAS byte_in(i);
-            WAIT FOR baudrate;
-        END LOOP;
-        midi_out <= '1';
-        WAIT FOR baudrate;
-    END PROCEDURE send_midi_byte;
+    -- CONSTANT baudrate : TIME := 26.925 us; -- 38.400 baud
+    -- PROCEDURE send_midi_byte (
+    --     SIGNAL byte_in : IN STD_LOGIC_VECTOR;
+    --     SIGNAL midi_out : OUT STD_LOGIC
+    -- ) IS
+    --     ALIAS in_byte : STD_LOGIC_VECTOR (7 DOWNTO 0) IS byte_in; -- ADDED
+    -- BEGIN
+    --     midi_out <= '0';
+    --     WAIT FOR baudrate;
+    --     FOR i IN in_byte'RANGE LOOP -- WAS 7 to 0
+    --         midi_out <= in_byte(i); -- WAS byte_in(i);
+    --         WAIT FOR baudrate;
+    --     END LOOP;
+    --     midi_out <= '1';
+    --     WAIT FOR baudrate;
+    -- END PROCEDURE send_midi_byte;
 
-    SIGNAL letra : STD_LOGIC_VECTOR (7 DOWNTO 0) := x"a";
-    SIGNAL midi_out : STD_LOGIC := '1'; -- fimrx
-    TYPE baud IS (IDLE, START, BD0, BD1, BD2, BD3, BD4, BD5, BD6, BD7, STOP);
-    SIGNAL baud_cnt : baud;
+    -- SIGNAL letra : STD_LOGIC_VECTOR (7 DOWNTO 0) := x"a";
+    -- SIGNAL midi_out : STD_LOGIC := '1'; -- fimrx
+    -- TYPE baud IS (IDLE, START, BD0, BD1, BD2, BD3, BD4, BD5, BD6, BD7, STOP);
+    -- SIGNAL baud_cnt : baud;
     ------------------------------------------------------------------------------------------------
     -----------------------------TESTANDO COMUNICACAO SERIAL----------------------------------------
 BEGIN
@@ -121,18 +135,20 @@ BEGIN
     dut : circuito_projeto
     PORT MAP
     (
-        entrada_RX => ntradas_RX_in,
+        entrada_RX => entrada_RX_in,
         clock => clk_in,
         reset => rst_in,
         iniciar => iniciar_in,
         tem_jogada => tem_jogada_in,
         leds_rgb => leds_rgb_out,
-        db_estado => estado_out,
-        db_contagem => contagem_out,
-        db_partida => partida_out,
+        db_estado => db_estado_out,
+        db_contagem => db_contagem_out,
+        db_partida => db_partida_out,
         pronto => pronto_out,
         ganhou => ganhou_out,
-        perdeu => perdeu_out
+        perdeu => perdeu_out,
+        teste_fudido => teste_fudido_in,
+        tem_teste => tem_teste_in
     );
 
     -- PROCEDURE_CALL :
@@ -164,7 +180,7 @@ BEGIN
 
     ---- Gera sinais de estimulo para a simulacao
 
-    -- Cenario de Teste #2: Acerta as primeiras senha na 4 jogada 
+    -- Cenario de Teste #2: Acerta a primeiras senha na 4 jogada 
     stimulus_2: process is
     begin
 
@@ -190,8 +206,91 @@ BEGIN
         rodada_jogo <= 0;
         -- espera antes da rodada
         wait for 1 sec;
-    ---- jogada #1 (ERRADA)
+        
 
+    
+    ---- jogada #1 (ERRADA)
+    -- wait for 100*clockPeriod;
+    -- teste_fudido_in <= "0110001001100010011000100110001001111001"; -- bbbby
+    -- wait for 1*clockPeriod; 
+    -- tem_teste_in <='1';
+    -- wait for 1*clockPeriod;
+    -- tem_teste_in <='0';
+    -- wait for 10 sec;
+
+    teste_fudido_in <= "0110010101100110011001110110100001100001"; -- efgha 
+    wait for 1*clockPeriod; 
+    tem_teste_in <='1';
+   wait for 1*clockPeriod;
+   tem_teste_in <='0';
+   wait for 10 sec;
+
+   teste_fudido_in <= "0110010101100110011001110110100001100001"; -- efgha 
+   wait for 1*clockPeriod; 
+   tem_teste_in <='1';
+  wait for 1*clockPeriod;
+  tem_teste_in <='0';
+  wait for 10 sec;
+
+
+    -- teste_fudido_in <= "0110000101100001011000010110000101111010"; -- aaaaz
+    -- wait for 1*clockPeriod; 
+    -- tem_teste_in <='1';
+    -- wait for 1*clockPeriod;
+    -- tem_teste_in <='0';
+    -- wait for 10 sec;
+
+    
+
+--     teste_fudido_in <= "0111000001100001011100010111001001110011"; -- paqrs
+--     wait for 1*clockPeriod; 
+--     tem_teste_in <='1';
+--    wait for 1*clockPeriod;
+--    tem_teste_in <='0';
+--    wait for 10 sec;
+
+   teste_fudido_in <= "0110101001101111011011100110000101110011"; -- jonas
+   wait for 1*clockPeriod; 
+   tem_teste_in <='1';
+  wait for 1*clockPeriod;
+  tem_teste_in <='0';
+  wait for 10 sec;
+
+  teste_fudido_in <= "0110101001101111011011100110000101110011"; -- jonas
+  wait for 1*clockPeriod; 
+  tem_teste_in <='1';
+ wait for 1*clockPeriod;
+ tem_teste_in <='0';
+ wait for 10 sec;
+
+
+--   teste_fudido_in <= "0111001101100001011011100110111101101010"; -- sanoj
+--   wait for 1*clockPeriod; 
+--   tem_teste_in <='1';
+--  wait for 1*clockPeriod;
+--  tem_teste_in <='0';
+--  wait for 10 sec;
+
+--   teste_fudido_in <= "0111001101100101011011100110111101101001"; -- senoi
+--   wait for 1*clockPeriod; 
+--   tem_teste_in <='1';
+--  wait for 1*clockPeriod;
+--  tem_teste_in <='0';
+--  wait for 10 sec;
+
+--    teste_fudido_in <= "0110110101101110011011110111000001100001"; -- mnopa
+--    wait for 1*clockPeriod; 
+--    tem_teste_in <='1';
+--   wait for 1*clockPeriod;
+--   tem_teste_in <='0';
+--   wait for 10 sec;
+
+  teste_fudido_in <= "0110000101100010011000110110010001100101"; -- abcde
+  wait for 1*clockPeriod; 
+  tem_teste_in <='1';
+ wait for 1*clockPeriod;
+ tem_teste_in <='0';
+ wait for 10 sec;
     -- letra_jogada_in <= "00010";
     -- indice_letra_in <= "001";
     -- wait for 1*clockPeriod; 
@@ -281,7 +380,7 @@ BEGIN
     -- wait for 9*clockPeriod;
 
     -- espera depois da jogada final
-    --     wait for 20*clockPeriod;  
+        wait for 20*clockPeriod;  
 
         ---- final do testbench
         assert false report "fim da simulacao" severity note;

@@ -3,6 +3,6 @@
 *.qpf
 *.txt
 *.mif
-*.s
+*.sof
 db/
 output_files/

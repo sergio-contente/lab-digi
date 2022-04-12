@@ -3,23 +3,25 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY circuito_projeto IS
 	PORT (
-  	    entrada_RX   : IN STD_LOGIC;
-		clock        : IN std_logic;
-		reset        : IN std_logic;
-		iniciar      : IN std_logic;
-		tem_jogada   : IN std_logic;
-		leds_rgb     : OUT std_logic_vector(4 DOWNTO 0);
-		db_estado    : OUT std_logic_vector(6 DOWNTO 0);
-		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
-		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
-		db_clock     : out std_logic;
-		db_tem_jogada: out std_logic;
-		db_iniciar   : out std_logic;
-		db_fim_contador_letras : out std_logic;
-		db_fim_rx	 : out std_logic;
-		pronto       : OUT std_logic;
-		ganhou       : OUT std_logic;
-		perdeu       : OUT std_logic
+		entrada_RX : IN STD_LOGIC;
+		clock : IN STD_LOGIC;
+		reset : IN STD_LOGIC;
+		iniciar : IN STD_LOGIC;
+		tem_jogada : IN STD_LOGIC;
+		leds_rgb : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+		db_estado : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+		db_contagem : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+		db_partida : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+		db_clock : OUT STD_LOGIC;
+		db_tem_jogada : OUT STD_LOGIC;
+		db_iniciar : OUT STD_LOGIC;
+		db_fim_contador_letras : OUT STD_LOGIC;
+		db_fim_rx : OUT STD_LOGIC;
+		pronto : OUT STD_LOGIC;
+		ganhou : OUT STD_LOGIC;
+		perdeu : OUT STD_LOGIC;
+		teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
+		tem_teste : IN STD_LOGIC
 	);
 END ENTITY;
 
@@ -42,9 +44,10 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_contagem_registrador_letra : IN STD_LOGIC;
 			reset_letra : IN STD_LOGIC;
 			fim_contador_letras : OUT STD_LOGIC;
-			fim_rx: out std_logic;
-			zera_contador_letras: in std_logic;
-			fim_timer: out std_logic
+			fim_rx : OUT STD_LOGIC;
+			zera_contador_letras : IN STD_LOGIC;
+			fim_timer : OUT STD_LOGIC;
+			teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -76,52 +79,56 @@ ARCHITECTURE arch OF circuito_projeto IS
 			db_estado : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 			incrementa_contagem_registrador_letra : OUT STD_LOGIC;
 			reset_letra : OUT STD_LOGIC;
-			zera_contador_letras: out std_logic;
-			fim_timer : in std_logic
+			zera_contador_letras : OUT STD_LOGIC;
+			fim_timer : IN STD_LOGIC;
+			tem_teste : IN STD_LOGIC
 		);
 	END COMPONENT;
 
-	component hexa7seg is
-    port (
-        hexa   : in  std_logic_vector(3 downto 0);
-        sseg   : out std_logic_vector(6 downto 0)
-    );
-	end component;
+	COMPONENT hexa7seg IS
+		PORT (
+			hexa : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			sseg : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+		);
+	END COMPONENT;
 
-	SIGNAL not_clock, s_reset_timer, s_enable_timer : std_logic;
-	signal s_db_contagem : std_logic_vector(3 downto 0);
-	signal s_db_partida, s_db_estado : std_logic_vector(3 downto 0);
+	SIGNAL not_clock, s_reset_timer, s_enable_timer : STD_LOGIC;
+	SIGNAL s_db_contagem : STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL s_db_partida, s_db_estado : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-	signal s_incrementa_partida, s_reset_contagem, s_jogada_igual_senha, s_fim_contador_letras, s_fim_rx, s_incrementa_contagem, 
-		s_incrementa_contagem_registrador_letra, s_reset_letra, s_incrementa_contagem_tentativas, s_fim_tentativas: std_logic;
-	signal en_reg_jogada : std_logic;
-	signal s_zera_contador_letras, s_fim_timer : std_logic;
+	SIGNAL s_incrementa_partida, s_reset_contagem, s_jogada_igual_senha, s_fim_contador_letras, s_fim_rx, s_incrementa_contagem,
+	s_incrementa_contagem_registrador_letra, s_reset_letra, s_incrementa_contagem_tentativas, s_fim_tentativas : STD_LOGIC;
+	SIGNAL en_reg_jogada : STD_LOGIC;
+	SIGNAL s_zera_contador_letras, s_fim_timer : STD_LOGIC;
+	-- signal teste_fudido : std_logic_vector(24 downto 0);
+	-- signal tem_teste : std_logic_vector;
 BEGIN
 	s_db_contagem(3) <= '0';
 	db_iniciar <= iniciar;
 	db_clock <= clock;
 	db_tem_jogada <= tem_jogada;
 	db_fim_rx <= s_fim_rx;
-	
+
 	db_fim_contador_letras <= s_fim_contador_letras;
 
 	display_contagem : hexa7seg
-	port map(
-        hexa => s_db_contagem,
-        sseg => db_contagem
+	PORT MAP(
+		hexa => s_db_contagem,
+		sseg => db_contagem
 	);
 	display_partida : hexa7seg
-	port map(
-        hexa => s_db_partida,
-        sseg => db_partida
+	PORT MAP(
+		hexa => s_db_partida,
+		sseg => db_partida
 	);
 	display_estado : hexa7seg
-	port map(
-        hexa => s_db_estado,
-        sseg => db_estado
+	PORT MAP(
+		hexa => s_db_estado,
+		sseg => db_estado
 	);
 
 	not_clock <= (NOT clock);
+
 
 	fd : fluxo_dados
 	PORT MAP(
@@ -135,7 +142,7 @@ BEGIN
 		jogada_igual_senha => s_jogada_igual_senha,
 		incrementa_contagem => s_incrementa_contagem,
 		incrementa_partida => s_incrementa_partida,
-		db_contagem => s_db_contagem(2 downto 0),
+		db_contagem => s_db_contagem(2 DOWNTO 0),
 		db_partida => s_db_partida,
 		leds => leds_rgb,
 		incrementa_contagem_registrador_letra => s_incrementa_contagem_registrador_letra,
@@ -143,7 +150,8 @@ BEGIN
 		fim_contador_letras => s_fim_contador_letras,
 		fim_rx => s_fim_rx,
 		zera_contador_letras => s_zera_contador_letras,
-		fim_timer => s_fim_timer
+		fim_timer => s_fim_timer,
+		teste_fudido => teste_fudido
 	);
 
 	uc : unidade_controle
@@ -161,13 +169,14 @@ BEGIN
 		reset_contagem => s_reset_contagem,
 		ganhou => ganhou,
 		perdeu => perdeu,
-		pronto => pronto, 
+		pronto => pronto,
 		incrementa_contagem_tentativas => s_incrementa_contagem,
 		incrementa_partida => s_incrementa_partida,
 		db_estado => s_db_estado,
 		incrementa_contagem_registrador_letra => s_incrementa_contagem_registrador_letra,
 		reset_letra => s_reset_letra,
 		zera_contador_letras => s_zera_contador_letras,
-		fim_timer => s_fim_timer
+		fim_timer => s_fim_timer,
+		tem_teste => tem_teste
 	);
 END arch;

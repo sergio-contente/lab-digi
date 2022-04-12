@@ -21,9 +21,10 @@ ENTITY fluxo_dados IS
     incrementa_contagem_registrador_letra : IN STD_LOGIC;
     reset_letra : IN STD_LOGIC;
     fim_contador_letras : OUT STD_LOGIC;
-    fim_rx: out std_logic;
-    zera_contador_letras: in std_logic;
-    fim_timer: out std_logic
+    fim_rx : OUT STD_LOGIC;
+    zera_contador_letras : IN STD_LOGIC;
+    fim_timer : OUT STD_LOGIC;
+    teste_fudido : in STD_LOGIC_VECTOR(39 DOWNTO 0)
   );
 END ENTITY;
 
@@ -56,8 +57,9 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_dado : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
   SIGNAL saida_contador_endereco : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL enable_registrador_letra: STD_LOGIC; 
+  SIGNAL enable_registrador_letra : STD_LOGIC;
 
+  signal s_fim_timer : std_logic;
   COMPONENT rx IS
     GENERIC (baudrate : INTEGER := 9600);
     PORT (
@@ -139,7 +141,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
 
   COMPONENT contador_m IS
     GENERIC (
-      CONSTANT M : INTEGER := 100000000 -- modulo do contador
+      CONSTANT M : INTEGER := 100 -- modulo do contador
     );
     PORT (
       clock : IN STD_LOGIC;
@@ -154,9 +156,9 @@ ARCHITECTURE estrutural OF fluxo_dados IS
 
   COMPONENT comparador_igualdade IS
     PORT (
-    jogada_in : in std_logic_vector(7 downto 0);
-    senha_in : in std_logic_vector(7 downto 0);
-    o_AEQB : out std_logic
+      jogada_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+      senha_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+      o_AEQB : OUT STD_LOGIC
     );
   END COMPONENT;
 
@@ -174,88 +176,94 @@ BEGIN
   db_contagem <= s_contagem;
   db_partida <= s_endereco;
 
-  s_en_letra1 <= '1' when enable_registrador_letra = '1' and contagem_letras = "000"  else '0';
-  s_en_letra2 <= '1' when enable_registrador_letra = '1' and contagem_letras = "001"  else '0';
-  s_en_letra3 <= '1' when enable_registrador_letra = '1' and contagem_letras = "010"  else '0';
-  s_en_letra4 <= '1' when enable_registrador_letra = '1' and contagem_letras = "011"  else '0';
-  s_en_letra5 <= '1' when enable_registrador_letra = '1' and contagem_letras = "100"  else '0';
+  s_en_letra1 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "000" ELSE
+    '0';
+  s_en_letra2 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "001" ELSE
+    '0';
+  s_en_letra3 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "010" ELSE
+    '0';
+  s_en_letra4 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "011" ELSE
+    '0';
+  s_en_letra5 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "100" ELSE
+    '0';
 
   jogada_igual_senha <= '1' WHEN (vec_saidas(0) = '1' AND vec_saidas(6) = '1' AND vec_saidas(12) = '1' AND vec_saidas(18) = '1' AND vec_saidas(24) = '1') ELSE
-  '0';
+    '0';
 
+  fim_timer <= s_fim_timer;
   timer : contador_m
-  port map(
-      clock => clock,
-      zera_as => reset_timer,
-      zera_s => '0',
-      conta => enable_timer,
-      Q => open,
-      fim => fim_timer,
-      meio => open
+  PORT MAP(
+    clock => clock,
+    zera_as => reset_timer,
+    zera_s => '0',
+    conta => enable_timer,
+    Q => OPEN,
+    fim => s_fim_timer,
+    meio => OPEN
   );
 
-  leds_colors : PROCESS (enable_timer) IS
+  leds_colors : PROCESS (s_fim_timer) IS
   BEGIN
-  if enable_timer = '1' then
-    if contagem_letras = "000" then
-      IF vec_saidas(4 DOWNTO 0) = "00000" THEN
-      leds(2 downto 0) <= "000";
-      leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(0) = '1' THEN
-      leds(2 downto 0) <= "000";
-      leds(4 downto 3) <= "11"; -- verde
-      ELSE
-      leds(2 downto 0) <= "000";
-      leds(4 downto 3) <= "01"; -- amarelo
+    IF s_fim_timer = '1' THEN
+      IF contagem_letras = "000" THEN
+        IF vec_saidas(4 DOWNTO 0) = "00000" THEN
+          leds(2 DOWNTO 0) <= "000";
+          leds(4 DOWNTO 3) <= "10"; -- vermelho
+        ELSIF vec_saidas(0) = '1' THEN
+          leds(2 DOWNTO 0) <= "000";
+          leds(4 DOWNTO 3) <= "11"; -- verde
+        ELSE
+          leds(2 DOWNTO 0) <= "000";
+          leds(4 DOWNTO 3) <= "01"; -- amarelo
+        END IF;
+      ELSIF contagem_letras = "001" THEN
+        IF vec_saidas(9 DOWNTO 5) = "00000" THEN
+          leds(2 DOWNTO 0) <= "001";
+          leds(4 DOWNTO 3) <= "10"; -- vermelho
+        ELSIF vec_saidas(6) = '1' THEN
+          leds(2 DOWNTO 0) <= "001";
+          leds(4 DOWNTO 3) <= "11"; -- verde
+        ELSE
+          leds(2 DOWNTO 0) <= "001";
+          leds(4 DOWNTO 3) <= "01"; -- amarelo
+        END IF;
+      ELSIF contagem_letras = "010" THEN
+        IF vec_saidas(14 DOWNTO 10) = "00000" THEN
+          leds(2 DOWNTO 0) <= "010";
+          leds(4 DOWNTO 3) <= "10"; -- vermelho
+        ELSIF vec_saidas(12) = '1' THEN
+          leds(2 DOWNTO 0) <= "010";
+          leds(4 DOWNTO 3) <= "11"; -- verde
+        ELSE
+          leds(2 DOWNTO 0) <= "010";
+          leds(4 DOWNTO 3) <= "01"; -- amarelo
+        END IF;
+      ELSIF contagem_letras = "011" THEN
+        IF vec_saidas(19 DOWNTO 15) = "00000" THEN
+          leds(2 DOWNTO 0) <= "011";
+          leds(4 DOWNTO 3) <= "10"; -- vermelho
+        ELSIF vec_saidas(18) = '1' THEN
+          leds(2 DOWNTO 0) <= "011";
+          leds(4 DOWNTO 3) <= "11"; -- verde
+        ELSE
+          leds(2 DOWNTO 0) <= "011";
+          leds(4 DOWNTO 3) <= "01"; -- amarelo
+        END IF;
+      ELSIF contagem_letras = "100" THEN
+        IF vec_saidas(24 DOWNTO 20) = "00000" THEN
+          leds(2 DOWNTO 0) <= "100";
+          leds(4 DOWNTO 3) <= "10"; -- vermelho
+        ELSIF vec_saidas(24) = '1' THEN
+          leds(2 DOWNTO 0) <= "100";
+          leds(4 DOWNTO 3) <= "11"; -- verde
+        ELSE
+          leds(2 DOWNTO 0) <= "100";
+          leds(4 DOWNTO 3) <= "01"; -- amarelo
+        END IF;
       END IF;
-    elsif contagem_letras = "001" then
-      IF vec_saidas(9 DOWNTO 5) = "00000" THEN
-      leds(2 downto 0) <= "001";
-      leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(6) = '1' THEN
-      leds(2 downto 0) <= "001";
-      leds(4 downto 3) <= "11"; -- verde
-      ELSE
-      leds(2 downto 0) <= "001";
-      leds(4 downto 3) <= "01"; -- amarelo
-      END IF;
-    elsif contagem_letras = "010" then
-      IF vec_saidas(14 DOWNTO 10) = "00000" THEN
-      leds(2 downto 0) <= "010";
-      leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(12) = '1' THEN
-      leds(2 downto 0) <= "010";
-      leds(4 downto 3) <= "11"; -- verde
-      ELSE
-      leds(2 downto 0) <= "010";
-      leds(4 downto 3) <= "01"; -- amarelo
-      END IF;
-    elsif contagem_letras = "011" then
-      IF vec_saidas(19 DOWNTO 15) = "00000" THEN
-      leds(2 downto 0) <= "011";
-      leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(18) = '1' THEN
-      leds(2 downto 0) <= "011";
-      leds(4 downto 3) <= "11"; -- verde
-      ELSE
-      leds(2 downto 0) <= "011";
-      leds(4 downto 3) <= "01"; -- amarelo
-      END IF;
-    elsif contagem_letras = "100" then
-      IF vec_saidas(24 DOWNTO 20) = "00000" THEN
-      leds(2 downto 0) <= "100";
-      leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(24) = '1' THEN
-      leds(2 downto 0) <= "100";
-      leds(4 downto 3) <= "11"; -- verde
-      ELSE
-      leds(2 downto 0) <= "100";
-      leds(4 downto 3) <= "01"; -- amarelo
-      END IF;
-    end if;
-  end if;
+    END IF;
   END PROCESS; -- identifier
-  
+
   contador_partida : contador_163
   PORT MAP(
     clock => clock,
@@ -357,11 +365,11 @@ BEGIN
   --   Q => s_jogada
   -- );
 
-  letra_jogada_1 <= s_jogada(7 DOWNTO 0);
-  letra_jogada_2 <= s_jogada(15 DOWNTO 8);
-  letra_jogada_3 <= s_jogada(23 DOWNTO 16);
-  letra_jogada_4 <= s_jogada(31 DOWNTO 24);
-  letra_jogada_5 <= s_jogada(39 DOWNTO 32);
+  letra_jogada_1 <= teste_fudido(7 DOWNTO 0);
+  letra_jogada_2 <= teste_fudido(15 DOWNTO 8);
+  letra_jogada_3 <= teste_fudido(23 DOWNTO 16);
+  letra_jogada_4 <= teste_fudido(31 DOWNTO 24);
+  letra_jogada_5 <= teste_fudido(39 DOWNTO 32);
 
   vec_jogadas(0) <= letra_jogada_1;
   vec_jogadas(1) <= letra_jogada_1;
@@ -415,14 +423,14 @@ BEGIN
   vec_senhas(23) <= s_senha(31 DOWNTO 24);
   vec_senhas(24) <= s_senha(39 DOWNTO 32);
 
-  memoria : ram_16x40  -- usar para Quartus
-  --memoria : ENTITY work.ram_16x40(ram_modelsim) -- usar para ModelSim
-    PORT MAP(
-      clk => clock,
-      endereco => s_endereco,
-      dado_entrada => vetor_zero,
-      we => '1', -- we ativo baixo
-      ce => '0',
-      dado_saida => s_senha
-    );
+  --memoria : ram_16x40 -- usar para Quartus
+  memoria : ENTITY work.ram_16x40(ram_modelsim) -- usar para ModelSim
+  PORT MAP(
+    clk => clock,
+    endereco => s_endereco,
+    dado_entrada => vetor_zero,
+    we => '1', -- we ativo baixo
+    ce => '0',
+    dado_saida => s_senha
+  );
 END estrutural;
