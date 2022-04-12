@@ -1,86 +1,126 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
-entity ram_16x40 is
-   port (       
-       clk          : in  std_logic;
-       endereco     : in  std_logic_vector(3 downto 0);
-       dado_entrada : in  std_logic_vector(39 downto 0);
-       we           : in  std_logic;
-       ce           : in  std_logic;
-       dado_saida   : out std_logic_vector(39 downto 0)
+ENTITY unidade_controle IS
+    PORT (
+        clock : IN STD_LOGIC;
+        reset : IN STD_LOGIC;
+        iniciar : IN STD_LOGIC;
+        fim_tentativas : IN STD_LOGIC;
+        tem_jogada : IN STD_LOGIC;
+        fim_contador_letras : IN STD_LOGIC;
+        jogada_igual_senha : IN STD_LOGIC;
+        fim_rx : IN STD_LOGIC;
+        reset_timer : OUT STD_LOGIC;
+        enable_timer : OUT STD_LOGIC;
+        reset_contagem : OUT STD_LOGIC;
+        ganhou : OUT STD_LOGIC;
+        perdeu : OUT STD_LOGIC;
+        pronto : OUT STD_LOGIC;
+        incrementa_contagem_tentativas : OUT STD_LOGIC;
+        incrementa_partida : OUT STD_LOGIC;
+        db_estado : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        incrementa_contagem_registrador_letra : OUT STD_LOGIC;
+        reset_letra : OUT STD_LOGIC;
+        zera_contador_letras: out std_logic;
+        fim_timer : in std_logic
     );
-end entity ram_16x40;
+END ENTITY;
 
-architecture ram_mif of ram_16x40 is
-  type   arranjo_memoria is array(0 to 15) of std_logic_vector(39 downto 0);
-  signal memoria : arranjo_memoria;
-  
-  -- Configuracao do Arquivo MIF
-  attribute ram_init_file: string;
-  attribute ram_init_file of memoria: signal is "ram_inicial.mif";
-  
-begin
+ARCHITECTURE fsm OF unidade_controle IS
+    TYPE t_estado IS (
+        espera,
+        preparacao_jogo,
+        espera_jogada,
+        incrementa_contagem_letra,
+        registra_letra,
+        limpa_palavra,
+        recebe_letra,
+        compara,
+        manda_leds,
+        incrementa_contagem_leds,
+        fim_perdeu,
+        fim_ganhou
+    );
+    SIGNAL Eatual, Eprox : t_estado;
+BEGIN
 
-  process(clk)
-  begin
-    if (clk = '1' and clk'event) then
-          if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
-           
-              -- Detecta ativacao de we (ativo baixo)
-              if (we = '0') 
-                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
-              end if;
-            
-          end if;
-      end if;
-  end process;
+    -- memoria de estado
+    PROCESS (clock, reset)
+    BEGIN
+        IF reset = '1' THEN
+            Eatual <= espera;
+        ELSIF clock'event AND clock = '1' THEN
+            Eatual <= Eprox;
+        END IF;
+    END PROCESS;
 
-  -- saida da memoria
-  dado_saida <= memoria(to_integer(unsigned(endereco)));
-  
-end architecture ram_mif;
+    -- logica de proximo estado
+    Eprox <=
+        espera WHEN Eatual = espera AND iniciar = '0' ELSE
+        preparacao_jogo WHEN (Eatual = espera AND iniciar = '1') ELSE
+        espera_jogada WHEN (Eatual = preparacao_jogo) OR (Eatual = espera_jogada AND tem_jogada = '0') OR (Eatual = limpa_palavra) ELSE
+        recebe_letra WHEN (Eatual = espera_jogada AND tem_jogada = '1') OR Eatual = incrementa_contagem_letra OR (Eatual = recebe_letra AND fim_rx = '0') ELSE
+        registra_letra WHEN Eatual = recebe_letra AND fim_rx = '1' AND fim_contador_letras = '0' ELSE
+        incrementa_contagem_letra WHEN Eatual = registra_letra ELSE
+        limpa_palavra WHEN (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '1' and jogada_igual_senha = '0' and fim_tentativas = '0') ELSE
+        compara WHEN (Eatual = recebe_letra AND fim_contador_letras = '1') ELSE
+        manda_leds WHEN (Eatual = compara) or (Eatual = incrementa_contagem_leds) or (Eatual = manda_leds and fim_timer = '0') ELSE
+        incrementa_contagem_leds when (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '0') ELSE
+        fim_perdeu WHEN (Eatual = manda_leds and fim_timer = '1' AND fim_contador_letras = '1' and jogada_igual_senha = '0' AND fim_tentativas = '1') ELSE
+        fim_ganhou WHEN (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '1' AND jogada_igual_senha = '1') ELSE
+        espera WHEN (Eatual = fim_perdeu) OR (Eatual = fim_ganhou) ELSE
+        espera;
 
+    -- logica de saída (maquina de Moore)
+    ganhou <= '1' WHEN Eatual = fim_ganhou ELSE
+        '0' WHEN Eatual = preparacao_jogo;
+    perdeu <= '1' WHEN Eatual = fim_perdeu ELSE
+        '0' WHEN Eatual = preparacao_jogo;
+    pronto <= '1' WHEN Eatual = fim_perdeu ELSE
+        '1' WHEN Eatual = fim_ganhou ELSE
+        '0' WHEN Eatual = preparacao_jogo;
 
--- Dados iniciais (para simulacao com Modelsim) 
-architecture ram_modelsim of ram_16x40 is
-  type   arranjo_memoria is array(0 to 15) of std_logic_vector(39 downto 0);
-  signal memoria : arranjo_memoria := (
-                                        "0111101001111010011110100111101001111010", --abcde
-                                        "0111101001111010011110100111101001111010", --abcde
-                                        "0111101001111010011110100111101001111010", --abcde
-                                        "0111101001111010011110100111101001111010", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001", --abcde
-                                        "0110000101100001011000010110000101100001" ); --abcde
-
-begin
-
-  process(clk)
-  begin
-    if (clk = '1' and clk'event) then
-          if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
-           
-              -- Detecta ativacao de we (ativo baixo)
-              if (we = '0') 
-                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
-              end if;
-            
-          end if;
-      end if;
-  end process;
-
-  -- saida da memoria
-  dado_saida <= memoria(to_integer(unsigned(endereco)));
-
-end architecture ram_modelsim;
+    WITH Eatual SELECT
+        reset_timer <= '1' WHEN incrementa_contagem_leds,
+        '1' when compara,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        enable_timer <= '1' WHEN manda_leds,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        zera_contador_letras <= '1' WHEN compara,
+        '1' WHEN limpa_palavra,
+        '1' when preparacao_jogo,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        reset_letra <= '1' WHEN preparacao_jogo,
+        '1' WHEN limpa_palavra,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_contagem_registrador_letra <= '1' WHEN incrementa_contagem_letra,
+		  '1' when incrementa_contagem_leds,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_partida <= '1' WHEN preparacao_jogo,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_contagem_tentativas <= '1' WHEN compara,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        reset_contagem <= '1' WHEN preparacao_jogo,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        db_estado <= "0000" WHEN espera, -- 0
+        "0001" WHEN preparacao_jogo, -- 1
+        "0010" WHEN espera_jogada, -- 2
+        "0011" WHEN registra_letra, -- 3  
+        "0100" WHEN incrementa_contagem_letra, -- 4
+        "0101" WHEN limpa_palavra, -- 5
+        "0110" WHEN compara, -- 6
+        "0111" WHEN manda_leds, --7
+        "1000" WHEN incrementa_contagem_leds, --8
+        "1001" WHEN fim_perdeu, -- 9
+        "1010" WHEN fim_ganhou, -- 10
+        "1111" WHEN OTHERS; -- F
+END ARCHITECTURE;
