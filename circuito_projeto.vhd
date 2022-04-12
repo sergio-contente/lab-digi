@@ -13,8 +13,8 @@ ENTITY circuito_projeto IS
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
 		db_clock     : out std_logic;
-	   db_tem_jogada: out std_logic;
-	   db_iniciar   : out std_logic;
+	    db_tem_jogada: out std_logic;
+	    db_iniciar   : out std_logic;
 		db_fim_contador_letras : out std_logic;
 		db_fim_rx	 : out std_logic;
 		pronto       : OUT std_logic;
@@ -42,7 +42,9 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_contagem_registrador_letra : IN STD_LOGIC;
 			reset_letra : IN STD_LOGIC;
 			fim_contador_letras : OUT STD_LOGIC;
-			fim_rx: out std_logic
+			fim_rx: out std_logic;
+			zera_contador_letras: in std_logic;
+			fim_timer: out std_logic
 		);
 	END COMPONENT;
 
@@ -73,7 +75,9 @@ ARCHITECTURE arch OF circuito_projeto IS
 			incrementa_partida : OUT STD_LOGIC;
 			db_estado : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 			incrementa_contagem_registrador_letra : OUT STD_LOGIC;
-			reset_letra : OUT STD_LOGIC
+			reset_letra : OUT STD_LOGIC;
+			zera_contador_letras: out std_logic;
+			fim_timer : in std_logic
 		);
 	END COMPONENT;
 
@@ -84,13 +88,14 @@ ARCHITECTURE arch OF circuito_projeto IS
     );
 	end component;
 
-	SIGNAL not_clock, reset_timer, enable_timer : std_logic;
+	SIGNAL not_clock, s_reset_timer, s_enable_timer : std_logic;
 	signal s_db_contagem : std_logic_vector(3 downto 0);
 	signal s_db_partida, s_db_estado : std_logic_vector(3 downto 0);
 
 	signal s_incrementa_partida, s_reset_contagem, s_jogada_igual_senha, s_fim_contador_letras, s_fim_rx, s_incrementa_contagem, 
 		s_incrementa_contagem_registrador_letra, s_reset_letra, s_incrementa_contagem_tentativas, s_fim_tentativas: std_logic;
 	signal en_reg_jogada : std_logic;
+	signal s_zera_contador_letras, s_fim_timer : std_logic;
 BEGIN
 	s_db_contagem(3) <= '0';
 	db_iniciar <= iniciar;
@@ -120,23 +125,25 @@ BEGIN
 
 	fd : fluxo_dados
 	PORT MAP(
-	entrada_RX => entrada_RX,
-    clock => clock,
-    reset => reset,
-    reset_timer => reset_timer,
-    enable_timer => enable_timer,
-    reset_contagem => s_reset_contagem,
-    fim_tentativas => s_fim_tentativas,
-    jogada_igual_senha => s_jogada_igual_senha,
-    incrementa_contagem => s_incrementa_contagem,
-    incrementa_partida => s_incrementa_partida,
-    db_contagem => s_db_contagem(2 downto 0),
-    db_partida => s_db_partida,
-    leds => leds_rgb,
-    incrementa_contagem_registrador_letra => s_incrementa_contagem_registrador_letra,
-    reset_letra => s_reset_letra,
-    fim_contador_letras => s_fim_contador_letras,
-    fim_rx => s_fim_rx
+		entrada_RX => entrada_RX,
+		clock => clock,
+		reset => reset,
+		reset_timer => s_reset_timer,
+		enable_timer => s_enable_timer,
+		reset_contagem => s_reset_contagem,
+		fim_tentativas => s_fim_tentativas,
+		jogada_igual_senha => s_jogada_igual_senha,
+		incrementa_contagem => s_incrementa_contagem,
+		incrementa_partida => s_incrementa_partida,
+		db_contagem => s_db_contagem(2 downto 0),
+		db_partida => s_db_partida,
+		leds => leds_rgb,
+		incrementa_contagem_registrador_letra => s_incrementa_contagem_registrador_letra,
+		reset_letra => s_reset_letra,
+		fim_contador_letras => s_fim_contador_letras,
+		fim_rx => s_fim_rx,
+		zera_contador_letras => s_zera_contador_letras,
+		fim_timer => s_fim_timer
 	);
 
 	uc : unidade_controle
@@ -149,14 +156,18 @@ BEGIN
 		fim_contador_letras => s_fim_contador_letras,
 		jogada_igual_senha => s_jogada_igual_senha,
 		fim_rx => s_fim_rx,
+		reset_timer => s_reset_timer,
+		enable_timer => s_enable_timer,
 		reset_contagem => s_reset_contagem,
 		ganhou => ganhou,
 		perdeu => perdeu,
 		pronto => pronto, 
+		incrementa_contagem_tentativas => s_incrementa_contagem,
 		incrementa_partida => s_incrementa_partida,
 		db_estado => s_db_estado,
 		incrementa_contagem_registrador_letra => s_incrementa_contagem_registrador_letra,
 		reset_letra => s_reset_letra,
-		incrementa_contagem_tentativas => s_incrementa_contagem
+		zera_contador_letras => s_zera_contador_letras,
+		fim_timer => s_fim_timer
 	);
 END arch;

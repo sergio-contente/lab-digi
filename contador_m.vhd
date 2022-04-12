@@ -31,7 +31,7 @@ use ieee.math_real.all;
 
 entity contador_m is
     generic (
-        constant M: integer := 86400000 -- modulo do contador
+        constant M: integer := 100000000 -- modulo do contador
     );
     port (
         clock   : in  std_logic;

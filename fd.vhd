@@ -21,7 +21,9 @@ ENTITY fluxo_dados IS
     incrementa_contagem_registrador_letra : IN STD_LOGIC;
     reset_letra : IN STD_LOGIC;
     fim_contador_letras : OUT STD_LOGIC;
-    fim_rx: out std_logic
+    fim_rx: out std_logic;
+    zera_contador_letras: in std_logic;
+    fim_timer: out std_logic
   );
 END ENTITY;
 
@@ -137,7 +139,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
 
   COMPONENT contador_m IS
     GENERIC (
-      CONSTANT M : INTEGER := 100 -- modulo do contador
+      CONSTANT M : INTEGER := 100000000 -- modulo do contador
     );
     PORT (
       clock : IN STD_LOGIC;
@@ -181,21 +183,77 @@ BEGIN
   jogada_igual_senha <= '1' WHEN (vec_saidas(0) = '1' AND vec_saidas(6) = '1' AND vec_saidas(12) = '1' AND vec_saidas(18) = '1' AND vec_saidas(24) = '1') ELSE
   '0';
 
-  leds_colors : PROCESS (vec_saidas) IS
-    VARIABLE pos : INTEGER := 0;
+  timer : contador_m
+  port map(
+      clock => clock,
+      zera_as => reset_timer,
+      zera_s => '0',
+      conta => enable_timer,
+      Q => open,
+      fim => fim_timer,
+      meio => open
+  );
+
+  leds_colors : PROCESS (enable_timer) IS
   BEGIN
-    assign_colors : FOR i IN 0 TO 4 LOOP
-      IF vec_saidas(5 * i + 4 DOWNTO 5 * i) = "00000" THEN
-        leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
-		  leds(4 downto 3) <= "10"; -- vermelho
-      ELSIF vec_saidas(6 * i) = '1' THEN
-		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
-		  leds(4 downto 3) <= "11"; -- verde
+  if enable_timer = '1' then
+    if contagem_letras = "000" then
+      IF vec_saidas(4 DOWNTO 0) = "00000" THEN
+      leds(2 downto 0) <= "000";
+      leds(4 downto 3) <= "10"; -- vermelho
+      ELSIF vec_saidas(0) = '1' THEN
+      leds(2 downto 0) <= "000";
+      leds(4 downto 3) <= "11"; -- verde
       ELSE
-		  leds(2 downto 0) <= std_logic_vector(to_unsigned(i, 3));
-		  leds(4 downto 3) <= "01"; -- amarelo
+      leds(2 downto 0) <= "000";
+      leds(4 downto 3) <= "01"; -- amarelo
       END IF;
-    END LOOP; -- identifier
+    elsif contagem_letras = "001" then
+      IF vec_saidas(9 DOWNTO 5) = "00000" THEN
+      leds(2 downto 0) <= "001";
+      leds(4 downto 3) <= "10"; -- vermelho
+      ELSIF vec_saidas(6) = '1' THEN
+      leds(2 downto 0) <= "001";
+      leds(4 downto 3) <= "11"; -- verde
+      ELSE
+      leds(2 downto 0) <= "001";
+      leds(4 downto 3) <= "01"; -- amarelo
+      END IF;
+    elsif contagem_letras = "010" then
+      IF vec_saidas(14 DOWNTO 10) = "00000" THEN
+      leds(2 downto 0) <= "010";
+      leds(4 downto 3) <= "10"; -- vermelho
+      ELSIF vec_saidas(12) = '1' THEN
+      leds(2 downto 0) <= "010";
+      leds(4 downto 3) <= "11"; -- verde
+      ELSE
+      leds(2 downto 0) <= "010";
+      leds(4 downto 3) <= "01"; -- amarelo
+      END IF;
+    elsif contagem_letras = "011" then
+      IF vec_saidas(19 DOWNTO 15) = "00000" THEN
+      leds(2 downto 0) <= "011";
+      leds(4 downto 3) <= "10"; -- vermelho
+      ELSIF vec_saidas(18) = '1' THEN
+      leds(2 downto 0) <= "011";
+      leds(4 downto 3) <= "11"; -- verde
+      ELSE
+      leds(2 downto 0) <= "011";
+      leds(4 downto 3) <= "01"; -- amarelo
+      END IF;
+    elsif contagem_letras = "100" then
+      IF vec_saidas(24 DOWNTO 20) = "00000" THEN
+      leds(2 downto 0) <= "100";
+      leds(4 downto 3) <= "10"; -- vermelho
+      ELSIF vec_saidas(24) = '1' THEN
+      leds(2 downto 0) <= "100";
+      leds(4 downto 3) <= "11"; -- verde
+      ELSE
+      leds(2 downto 0) <= "100";
+      leds(4 downto 3) <= "01"; -- amarelo
+      END IF;
+    end if;
+  end if;
   END PROCESS; -- identifier
   
   contador_partida : contador_163
@@ -213,7 +271,7 @@ BEGIN
   contador_letras : contador_5
   PORT MAP(
     clock => clock,
-    clr => reset_letra,
+    clr => zera_contador_letras,
     ld => '0',
     ent => '1',
     enp => incrementa_contagem_registrador_letra,
@@ -299,11 +357,11 @@ BEGIN
   --   Q => s_jogada
   -- );
 
-  letra_jogada_5 <= s_jogada(7 DOWNTO 0);
-  letra_jogada_4 <= s_jogada(15 DOWNTO 8);
+  letra_jogada_1 <= s_jogada(7 DOWNTO 0);
+  letra_jogada_2 <= s_jogada(15 DOWNTO 8);
   letra_jogada_3 <= s_jogada(23 DOWNTO 16);
-  letra_jogada_2 <= s_jogada(31 DOWNTO 24);
-  letra_jogada_1 <= s_jogada(39 DOWNTO 32);
+  letra_jogada_4 <= s_jogada(31 DOWNTO 24);
+  letra_jogada_5 <= s_jogada(39 DOWNTO 32);
 
   vec_jogadas(0) <= letra_jogada_1;
   vec_jogadas(1) <= letra_jogada_1;
@@ -330,12 +388,6 @@ BEGIN
   vec_jogadas(22) <= letra_jogada_5;
   vec_jogadas(23) <= letra_jogada_5;
   vec_jogadas(24) <= letra_jogada_5;
-  vec_jogadas(20) <= letra_jogada_5;
-  vec_jogadas(21) <= letra_jogada_5;
-  vec_jogadas(22) <= letra_jogada_5;
-  vec_jogadas(23) <= letra_jogada_5;
-  vec_jogadas(24) <= letra_jogada_5;
-  
 
   vec_senhas(0) <= s_senha(7 DOWNTO 0);
   vec_senhas(1) <= s_senha(15 DOWNTO 8);
@@ -363,8 +415,8 @@ BEGIN
   vec_senhas(23) <= s_senha(31 DOWNTO 24);
   vec_senhas(24) <= s_senha(39 DOWNTO 32);
 
-  --memoria : ram_16x40  -- usar para Quartus
-  memoria : ENTITY work.ram_16x40(ram_modelsim) -- usar para ModelSim
+  memoria : ram_16x40  -- usar para Quartus
+  --memoria : ENTITY work.ram_16x40(ram_modelsim) -- usar para ModelSim
     PORT MAP(
       clk => clock,
       endereco => s_endereco,
