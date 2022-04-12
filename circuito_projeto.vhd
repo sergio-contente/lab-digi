@@ -13,8 +13,8 @@ ENTITY circuito_projeto IS
 		db_contagem  : OUT std_logic_vector(6 DOWNTO 0);
 		db_partida   : OUT std_logic_vector(6 DOWNTO 0);
 		db_clock     : out std_logic;
-	    db_tem_jogada: out std_logic;
-	    db_iniciar   : out std_logic;
+		db_tem_jogada: out std_logic;
+		db_iniciar   : out std_logic;
 		db_fim_contador_letras : out std_logic;
 		db_fim_rx	 : out std_logic;
 		pronto       : OUT std_logic;
