@@ -24,9 +24,7 @@ ENTITY unidade_controle IS
         reset_letra : OUT STD_LOGIC;
         zera_contador_letras: out std_logic;
         fim_timer : in std_logic;
-        tem_teste: in  std_logic;
-        segue: in std_logic --PIN_C16
-        en_letra: out std_logic
+        tem_teste: in  std_logic
     );
 END ENTITY;
 
@@ -65,13 +63,13 @@ BEGIN
         espera_jogada WHEN (Eatual = preparacao_jogo) OR (Eatual = limpa_palavra) or (Eatual = espera_jogada and tem_teste = '0') ELSE
         recebe_letra WHEN (Eatual = espera_jogada AND tem_jogada = '1') OR Eatual = incrementa_contagem_letra OR (Eatual = recebe_letra AND fim_rx = '0') ELSE
         registra_letra WHEN Eatual = recebe_letra AND fim_rx = '1' AND fim_contador_letras = '0' ELSE
-        compara WHEN Eatual= registra_letra OR Eatual= compara AND segue='0' ELSE
-        incrementa_contagem_letra WHEN Eatual = compara AND segue='1' ELSE
-        conta_palavra WHEN Eatual = recebe_letra and  
-        limpa_palavra WHEN (Eatual = recebe and fim_contador_letras = '1' and fim_tentativas = '0') ELSE
-        --compara WHEN (Eatual = recebe_letra AND fim_contador_letras = '1') or (Eatual=espera_jogada and tem_teste='1') ELSE
-        fim_perdeu WHEN (Eatual = manda_leds AND fim_contador_letras = '1' and jogada_igual_senha = '0' AND fim_tentativas = '1') ELSE
-        fim_ganhou WHEN (Eatual = manda_leds and fim_contador_letras = '1' AND jogada_igual_senha = '1') ELSE
+        incrementa_contagem_letra WHEN Eatual = registra_letra ELSE
+        limpa_palavra WHEN (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '1' and jogada_igual_senha = '0' and fim_tentativas = '0') ELSE
+        compara WHEN (Eatual = recebe_letra AND fim_contador_letras = '1') or (Eatual=espera_jogada and tem_teste='1') ELSE
+        manda_leds WHEN (Eatual = compara) or (Eatual = incrementa_contagem_leds) or (Eatual = manda_leds and fim_timer = '0') ELSE
+        incrementa_contagem_leds when (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '0') ELSE
+        fim_perdeu WHEN (Eatual = manda_leds and fim_timer = '1' AND fim_contador_letras = '1' and jogada_igual_senha = '0' AND fim_tentativas = '1') ELSE
+        fim_ganhou WHEN (Eatual = manda_leds and fim_timer = '1' and fim_contador_letras = '1' AND jogada_igual_senha = '1') ELSE
         espera WHEN (Eatual = fim_perdeu) OR (Eatual = fim_ganhou) ELSE
         espera;
 
@@ -85,37 +83,35 @@ BEGIN
         '0' WHEN Eatual = preparacao_jogo;
 
     WITH Eatual SELECT
-        reset_timer <= '1' WHEN compara,
+        reset_timer <= '1' WHEN incrementa_contagem_leds,
+        '1' when compara,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
         enable_timer <= '1' WHEN manda_leds,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
-        zera_contador_letras <= '1' WHEN espera_jogada,
+        zera_contador_letras <= '1' WHEN compara,
+        '1' WHEN limpa_palavra,
+        '1' when preparacao_jogo,
         '0' WHEN OTHERS;
-
     WITH Eatual SELECT
-        reset_letra <= '1' WHEN preparacao_jogo | incrementa_contagem_letra,
+        reset_letra <= '1' WHEN preparacao_jogo,
         '1' WHEN limpa_palavra,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
         incrementa_contagem_registrador_letra <= '1' WHEN incrementa_contagem_letra,
+		  '1' when incrementa_contagem_leds,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
         incrementa_partida <= '1' WHEN preparacao_jogo,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
-        incrementa_contagem_tentativas <= '1' WHEN ,
+        incrementa_contagem_tentativas <= '1' WHEN compara,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
         reset_contagem <= '1' WHEN preparacao_jogo,
         '0' WHEN OTHERS;
     WITH Eatual SELECT
-        en_letra <= '1' WHEN registra_letra,
-        '0' WHEN OTHERS; 
-    
-    
-        WITH Eatual SELECT
         db_estado <= "0000" WHEN espera, -- 0
         "0001" WHEN preparacao_jogo, -- 1
         "0010" WHEN espera_jogada, -- 2
@@ -123,6 +119,8 @@ BEGIN
         "0100" WHEN incrementa_contagem_letra, -- 4
         "0101" WHEN limpa_palavra, -- 5
         "0110" WHEN compara, -- 6
+        "0111" WHEN manda_leds, --7
+        "1000" WHEN incrementa_contagem_leds, --8
         "1001" WHEN fim_perdeu, -- 9
         "1010" WHEN fim_ganhou, -- 10
         "1111" WHEN OTHERS; -- F

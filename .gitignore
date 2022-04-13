@@ -4,9 +4,5 @@
 *.txt
 *.mif
 *.sof
-*.root_partition.*
-*.rrp.hdb
-*.rrs.cdb
-*.db_info
 db/
 output_files/
