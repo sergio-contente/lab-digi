@@ -21,7 +21,8 @@ ENTITY circuito_projeto IS
 		ganhou : OUT STD_LOGIC;
 		perdeu : OUT STD_LOGIC;
 		teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
-		tem_teste : IN STD_LOGIC
+		tem_teste : IN STD_LOGIC;
+		segue: in std_logic --
 	);
 END ENTITY;
 
@@ -47,7 +48,8 @@ ARCHITECTURE arch OF circuito_projeto IS
 			fim_rx : OUT STD_LOGIC;
 			zera_contador_letras : IN STD_LOGIC;
 			fim_timer : OUT STD_LOGIC;
-			teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0)
+			teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
+			en_letra: in std_logic
 		);
 	END COMPONENT;
 
@@ -81,7 +83,9 @@ ARCHITECTURE arch OF circuito_projeto IS
 			reset_letra : OUT STD_LOGIC;
 			zera_contador_letras : OUT STD_LOGIC;
 			fim_timer : IN STD_LOGIC;
-			tem_teste : IN STD_LOGIC
+			tem_teste : IN STD_LOGIC;
+			segue: in std_logic;
+			en_letra: out std_logic
 		);
 	END COMPONENT;
 
@@ -100,6 +104,7 @@ ARCHITECTURE arch OF circuito_projeto IS
 	s_incrementa_contagem_registrador_letra, s_reset_letra, s_incrementa_contagem_tentativas, s_fim_tentativas : STD_LOGIC;
 	SIGNAL en_reg_jogada : STD_LOGIC;
 	SIGNAL s_zera_contador_letras, s_fim_timer : STD_LOGIC;
+	SIGNAL s_en_letra: std_logic
 	-- signal teste_fudido : std_logic_vector(24 downto 0);
 	-- signal tem_teste : std_logic_vector;
 BEGIN
@@ -152,6 +157,7 @@ BEGIN
 		zera_contador_letras => s_zera_contador_letras,
 		fim_timer => s_fim_timer,
 		teste_fudido => teste_fudido
+		en_letra => s_en_letra
 	);
 
 	uc : unidade_controle
@@ -177,6 +183,8 @@ BEGIN
 		reset_letra => s_reset_letra,
 		zera_contador_letras => s_zera_contador_letras,
 		fim_timer => s_fim_timer,
-		tem_teste => tem_teste
+		tem_teste => tem_teste,
+		segue => segue,
+		en_letra => s_en_letra
 	);
 END arch;
