@@ -17,14 +17,15 @@ ENTITY fluxo_dados IS
     incrementa_partida : IN STD_LOGIC;
     db_contagem : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     db_partida : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    leds : OUT STD_LOGIC_VECTOR (4 DOWNTO 0);
+    leds : OUT STD_LOGIC_VECTOR (1 DOWNTO 0); -- S0-S1
     incrementa_contagem_registrador_letra : IN STD_LOGIC;
     reset_letra : IN STD_LOGIC;
     fim_contador_letras : OUT STD_LOGIC;
     fim_rx : OUT STD_LOGIC;
     zera_contador_letras : IN STD_LOGIC;
     fim_timer : OUT STD_LOGIC;
-    teste_fudido : in STD_LOGIC_VECTOR(39 DOWNTO 0)
+    teste_fudido : in STD_LOGIC_VECTOR(39 DOWNTO 0);
+    en_letra: in std_logic
   );
 END ENTITY;
 
@@ -35,11 +36,12 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL vec_jogadas : vector5(24 DOWNTO 0);
   SIGNAL vec_senhas : vector5(24 DOWNTO 0);
   SIGNAL vec_saidas : STD_LOGIC_VECTOR(24 DOWNTO 0);
-  SIGNAL s_en_letra1 : STD_LOGIC;
-  SIGNAL s_en_letra2 : STD_LOGIC;
-  SIGNAL s_en_letra3 : STD_LOGIC;
-  SIGNAL s_en_letra4 : STD_LOGIC;
-  SIGNAL s_en_letra5 : STD_LOGIC;
+  --SIGNAL s_en_letra : STD_LOGIC;
+  SIGNAL enable : std_logic;
+  -- SIGNAL s_en_letra2 : STD_LOGIC;
+  -- SIGNAL s_en_letra3 : STD_LOGIC;
+  -- SIGNAL s_en_letra4 : STD_LOGIC;
+  -- SIGNAL s_en_letra5 : STD_LOGIC;
   SIGNAL contagem_letras : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL letra_jogada : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL letra_jogada_1 : STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -53,7 +55,7 @@ ARCHITECTURE estrutural OF fluxo_dados IS
   SIGNAL s_senha : STD_LOGIC_VECTOR (39 DOWNTO 0);
   SIGNAL vetor_zero : STD_LOGIC_VECTOR (39 DOWNTO 0);
   SIGNAL s_contagem : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL s_jogada : STD_LOGIC_VECTOR (39 DOWNTO 0);
+  SIGNAL s_jogada : STD_LOGIC_VECTOR (7 DOWNTO 0);
   SIGNAL s_dado : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
   SIGNAL saida_contador_endereco : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -187,16 +189,16 @@ BEGIN
   db_contagem <= s_contagem;
   db_partida <= s_endereco;
 
-  s_en_letra1 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "000" ELSE
-    '0';
-  s_en_letra2 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "001" ELSE
-    '0';
-  s_en_letra3 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "010" ELSE
-    '0';
-  s_en_letra4 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "011" ELSE
-    '0';
-  s_en_letra5 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "100" ELSE
-    '0';
+  -- s_en_letra1 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "000" ELSE
+  --   '0';
+  -- s_en_letra2 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "001" ELSE
+  --   '0';
+  -- s_en_letra3 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "010" ELSE
+  --   '0';
+  -- s_en_letra4 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "011" ELSE
+  --   '0';
+  -- s_en_letra5 <= '1' WHEN enable_registrador_letra = '1' AND contagem_letras = "100" ELSE
+  --   '0';
 
   jogada_igual_senha <= '1' WHEN (vec_saidas(0) = '1' AND vec_saidas(6) = '1' AND vec_saidas(12) = '1' AND vec_saidas(18) = '1' AND vec_saidas(24) = '1') ELSE
     '0';
@@ -308,52 +310,47 @@ BEGIN
     Q => contagem_letras,
     RCO => fim_contador_letras
   );
-
-  letra1 : registrador_8
+  
+ enable <= contagem_letras;
+  
+ 
+ 
+ letra1 : registrador_8
   PORT MAP(
     clock => clock,
     clear => reset_letra,
-    en1 => s_en_letra1,
-    en2 => s_en_letra1,
+    en1 => en_letra,
+    en2 => en_letra,
     D => letra_jogada,
-    Q => s_jogada(7 DOWNTO 0)
+    Q => s_jogada
   );
-  letra2 : registrador_8
-  PORT MAP(
-    clock => clock,
-    clear => reset_letra,
-    en1 => s_en_letra2,
-    en2 => s_en_letra2,
-    D => letra_jogada,
-    Q => s_jogada(15 DOWNTO 8)
-  );
-  letra3 : registrador_8
-  PORT MAP(
-    clock => clock,
-    clear => reset_letra,
-    en1 => s_en_letra3,
-    en2 => s_en_letra3,
-    D => letra_jogada,
-    Q => s_jogada(23 DOWNTO 16)
-  );
-  letra4 : registrador_8
-  PORT MAP(
-    clock => clock,
-    clear => reset_letra,
-    en1 => s_en_letra4,
-    en2 => s_en_letra4,
-    D => letra_jogada,
-    Q => s_jogada(31 DOWNTO 24)
-  );
-  letra5 : registrador_8
-  PORT MAP(
-    clock => clock,
-    clear => reset_letra,
-    en1 => s_en_letra5,
-    en2 => s_en_letra5,
-    D => letra_jogada,
-    Q => s_jogada(39 DOWNTO 32)
-  );
+  -- letra3 : registrador_8
+  -- PORT MAP(
+  --   clock => clock,
+  --   clear => reset_letra,
+  --   en1 => s_en_letra3,
+  --   en2 => s_en_letra3,
+  --   D => letra_jogada,
+  --   Q => s_jogada(23 DOWNTO 16)
+  -- );
+  -- letra4 : registrador_8
+  -- PORT MAP(
+  --   clock => clock,
+  --   clear => reset_letra,
+  --   en1 => s_en_letra4,
+  --   en2 => s_en_letra4,
+  --   D => letra_jogada,
+  --   Q => s_jogada(31 DOWNTO 24)
+  -- );
+  -- letra5 : registrador_8
+  -- PORT MAP(
+  --   clock => clock,
+  --   clear => reset_letra,
+  --   en1 => s_en_letra5,
+  --   en2 => s_en_letra5,
+  --   D => letra_jogada,
+  --   Q => s_jogada(39 DOWNTO 32)
+  -- );
 
   fim_rx <= enable_registrador_letra;
 
@@ -376,7 +373,21 @@ BEGIN
     Q => s_contagem,
     rco => fim_tentativas
   );
-  -- reg_ultima_jogada : registrador_25
+
+  leds <= "11" when s_jogada = s_senha(7 downto 0) and enable="000" OR -- VERDE
+                    s_jogada = s_senha(15 downto 8) and enable="001" OR
+                    s_jogada = s_senha(23 downto 16) and enable="010" OR
+                    s_jogada = s_senha(31 downto 24) and enable="010" OR
+                    s_jogada = s_senha(39 downto 32) and enable="100" ELSE
+          "01" when s_jogada = s_senha(7 downto 0) and NOT enable="000" OR -- AMARELO
+                    s_jogada = s_senha(15 downto 8) and NOT enable="001" OR
+                    s_jogada = s_senha(23 downto 16) and NOT enable="010" OR
+                    s_jogada = s_senha(31 downto 24) and NOT enable="010" OR
+                    s_jogada = s_senha(39 downto 32) and NOT enable="100" ELSE
+          "00" when s_jogada = "00000000" ELSE
+          "10"; -- VERMELHO
+          
+-- reg_ultima_jogada : registrador_25
   -- PORT MAP(
   --   clock => clock,
   --   clear => clr_jogada,
@@ -392,57 +403,57 @@ BEGIN
   letra_jogada_4 <= teste_fudido(31 DOWNTO 24);
   letra_jogada_5 <= teste_fudido(39 DOWNTO 32);
 
-  vec_jogadas(0) <= letra_jogada_1;
-  vec_jogadas(1) <= letra_jogada_1;
-  vec_jogadas(2) <= letra_jogada_1;
-  vec_jogadas(3) <= letra_jogada_1;
-  vec_jogadas(4) <= letra_jogada_1;
-  vec_jogadas(5) <= letra_jogada_2;
-  vec_jogadas(6) <= letra_jogada_2;
-  vec_jogadas(7) <= letra_jogada_2;
-  vec_jogadas(8) <= letra_jogada_2;
-  vec_jogadas(9) <= letra_jogada_2;
-  vec_jogadas(10) <= letra_jogada_3;
-  vec_jogadas(11) <= letra_jogada_3;
-  vec_jogadas(12) <= letra_jogada_3;
-  vec_jogadas(13) <= letra_jogada_3;
-  vec_jogadas(14) <= letra_jogada_3;
-  vec_jogadas(15) <= letra_jogada_4;
-  vec_jogadas(16) <= letra_jogada_4;
-  vec_jogadas(17) <= letra_jogada_4;
-  vec_jogadas(18) <= letra_jogada_4;
-  vec_jogadas(19) <= letra_jogada_4;
-  vec_jogadas(20) <= letra_jogada_5;
-  vec_jogadas(21) <= letra_jogada_5;
-  vec_jogadas(22) <= letra_jogada_5;
-  vec_jogadas(23) <= letra_jogada_5;
-  vec_jogadas(24) <= letra_jogada_5;
+  -- vec_jogadas(0) <= letra_jogada_1;
+  -- vec_jogadas(1) <= letra_jogada_1;
+  -- vec_jogadas(2) <= letra_jogada_1;
+  -- vec_jogadas(3) <= letra_jogada_1;
+  -- vec_jogadas(4) <= letra_jogada_1;
+  -- vec_jogadas(5) <= letra_jogada_2;
+  -- vec_jogadas(6) <= letra_jogada_2;
+  -- vec_jogadas(7) <= letra_jogada_2;
+  -- vec_jogadas(8) <= letra_jogada_2;
+  -- vec_jogadas(9) <= letra_jogada_2;
+  -- vec_jogadas(10) <= letra_jogada_3;
+  -- vec_jogadas(11) <= letra_jogada_3;
+  -- vec_jogadas(12) <= letra_jogada_3;
+  -- vec_jogadas(13) <= letra_jogada_3;
+  -- vec_jogadas(14) <= letra_jogada_3;
+  -- vec_jogadas(15) <= letra_jogada_4;
+  -- vec_jogadas(16) <= letra_jogada_4;
+  -- vec_jogadas(17) <= letra_jogada_4;
+  -- vec_jogadas(18) <= letra_jogada_4;
+  -- vec_jogadas(19) <= letra_jogada_4;
+  -- vec_jogadas(20) <= letra_jogada_5;
+  -- vec_jogadas(21) <= letra_jogada_5;
+  -- vec_jogadas(22) <= letra_jogada_5;
+  -- vec_jogadas(23) <= letra_jogada_5;
+  -- vec_jogadas(24) <= letra_jogada_5;
 
-  vec_senhas(0) <= s_senha(7 DOWNTO 0);
-  vec_senhas(1) <= s_senha(15 DOWNTO 8);
-  vec_senhas(2) <= s_senha(23 DOWNTO 16);
-  vec_senhas(3) <= s_senha(31 DOWNTO 24);
-  vec_senhas(4) <= s_senha(39 DOWNTO 32);
-  vec_senhas(5) <= s_senha(7 DOWNTO 0);
-  vec_senhas(6) <= s_senha(15 DOWNTO 8);
-  vec_senhas(7) <= s_senha(23 DOWNTO 16);
-  vec_senhas(8) <= s_senha(31 DOWNTO 24);
-  vec_senhas(9) <= s_senha(39 DOWNTO 32);
-  vec_senhas(10) <= s_senha(7 DOWNTO 0);
-  vec_senhas(11) <= s_senha(15 DOWNTO 8);
-  vec_senhas(12) <= s_senha(23 DOWNTO 16);
-  vec_senhas(13) <= s_senha(31 DOWNTO 24);
-  vec_senhas(14) <= s_senha(39 DOWNTO 32);
-  vec_senhas(15) <= s_senha(7 DOWNTO 0);
-  vec_senhas(16) <= s_senha(15 DOWNTO 8);
-  vec_senhas(17) <= s_senha(23 DOWNTO 16);
-  vec_senhas(18) <= s_senha(31 DOWNTO 24);
-  vec_senhas(19) <= s_senha(39 DOWNTO 32);
-  vec_senhas(20) <= s_senha(7 DOWNTO 0);
-  vec_senhas(21) <= s_senha(15 DOWNTO 8);
-  vec_senhas(22) <= s_senha(23 DOWNTO 16);
-  vec_senhas(23) <= s_senha(31 DOWNTO 24);
-  vec_senhas(24) <= s_senha(39 DOWNTO 32);
+  -- vec_senhas(0) <= s_senha(7 DOWNTO 0);
+  -- vec_senhas(1) <= s_senha(15 DOWNTO 8);
+  -- vec_senhas(2) <= s_senha(23 DOWNTO 16);
+  -- vec_senhas(3) <= s_senha(31 DOWNTO 24);
+  -- vec_senhas(4) <= s_senha(39 DOWNTO 32);
+  -- vec_senhas(5) <= s_senha(7 DOWNTO 0);
+  -- vec_senhas(6) <= s_senha(15 DOWNTO 8);
+  -- vec_senhas(7) <= s_senha(23 DOWNTO 16);
+  -- vec_senhas(8) <= s_senha(31 DOWNTO 24);
+  -- vec_senhas(9) <= s_senha(39 DOWNTO 32);
+  -- vec_senhas(10) <= s_senha(7 DOWNTO 0);
+  -- vec_senhas(11) <= s_senha(15 DOWNTO 8);
+  -- vec_senhas(12) <= s_senha(23 DOWNTO 16);
+  -- vec_senhas(13) <= s_senha(31 DOWNTO 24);
+  -- vec_senhas(14) <= s_senha(39 DOWNTO 32);
+  -- vec_senhas(15) <= s_senha(7 DOWNTO 0);
+  -- vec_senhas(16) <= s_senha(15 DOWNTO 8);
+  -- vec_senhas(17) <= s_senha(23 DOWNTO 16);
+  -- vec_senhas(18) <= s_senha(31 DOWNTO 24);
+  -- vec_senhas(19) <= s_senha(39 DOWNTO 32);
+  -- vec_senhas(20) <= s_senha(7 DOWNTO 0);
+  -- vec_senhas(21) <= s_senha(15 DOWNTO 8);
+  -- vec_senhas(22) <= s_senha(23 DOWNTO 16);
+  -- vec_senhas(23) <= s_senha(31 DOWNTO 24);
+  -- vec_senhas(24) <= s_senha(39 DOWNTO 32);
 
   --memoria : ram_16x40 -- usar para Quartus
   memoria : ENTITY work.ram_16x40(ram_modelsim) -- usar para ModelSim
