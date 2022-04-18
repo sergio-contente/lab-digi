@@ -106,7 +106,7 @@ def pronto_publish():
 
     #print(f'datetime.datetime.now().second - tempo: {datetime.datetime.now().second - tempo}')
     while not letter_published:
-        if (contagem == 2 or datetime.datetime.now().second - tempo > 15) and contagem != 0:
+        if ((contagem == 2 and datetime.datetime.now().second - tempo > 2) or datetime.datetime.now().second - tempo > 10): #and contagem != 0:
             print("\n>>>", datetime.datetime.now().second - tempo, "\n")
             print("Recebi uma cor")
             client.publish(user+"/E" + "3", payload="1", qos=0)
@@ -115,7 +115,7 @@ def pronto_publish():
             time.sleep(1)
             print(f'contagem : {contagem}')
             contagem = 0
-            resultados += leds[0] + leds[1]
+            resultados += leds[1] + leds[0]
             contagem_letras += 1
             aguardando_publish = False
             print(f'resultados : {resultados}')
@@ -143,7 +143,6 @@ def on_message(client, userdata, msg):
     global recebeu_l1
 
     aguardando_publish = True
-    tempo = datetime.datetime.now().second
     if word_published == True:
         palavra = str(msg.payload.decode("utf-8"))
         print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
@@ -152,7 +151,8 @@ def on_message(client, userdata, msg):
     if str(msg.topic) == user+"/E1":
         print("Recebi uma mensagem de E1")
         word_published = False  
-    elif str(msg.topic) == user+"/S0" or str(msg.topic) == user+"/S1":
+    elif (str(msg.topic) == user+"/S0" or str(msg.topic) == user+"/S1") and str(msg.payload.decode("utf-8") == "1"):
+        tempo = datetime.datetime.now().second
         print("entrou em if de s0 ou s1")
         print(f"recebeu l0 = {recebeu_l0} e recebeu l1 = {recebeu_l1}")
         if str(msg.topic) == user+"/S0" and (recebeu_l0 == False):
@@ -204,10 +204,15 @@ while True:
         print(f'contagem_letras: {contagem_letras}')
         if iterador_palavra == contagem_letras:
             print(f'publiquei: {iterador_palavra == contagem_letras}')
-            publish_letter(letter)
-            tem_jogada = "0"
-            client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
-            letter_published = False
+            if contagem_letras < 5:
+              publish_letter(letter)
+              tem_jogada = "1"
+              client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
+              time.sleep(1)
+              tem_jogada = "0"
+              client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
+              time.sleep(1)
+              letter_published = False
     elif first_time:
         first_time = False
         word_published = True
@@ -216,7 +221,6 @@ while True:
     elif tem_jogada == "1" and contagem_letras == 5:
         tem_jogada = "0"
         client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
-        time.sleep(0.00075)
     # if aguardando_publish:
     pronto_publish()
 
@@ -237,6 +241,7 @@ while True:
         timer = False
         tem_jogada = "0"
         client.publish(user+"/E0", payload=tem_jogada, qos=0, retain=False)
+        print(f'Resultado final: {resultados}')
         resultados = ""  # resetando resultados
 
 client.loop_stop()
