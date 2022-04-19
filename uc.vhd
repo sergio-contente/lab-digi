@@ -1,146 +1,129 @@
-library ieee;
-use ieee.std_logic_1164.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
-entity unidade_controle is
-    port (
-    clock : in std_logic;
-    reset : in std_logic;
-    iniciar : in std_logic;
-    fimE : in std_logic;
-	fimS : in std_logic;
-	fimTMR : in std_logic;
-	igualJ : in std_logic;
-	igualS : in std_logic;
-    jogada : in std_logic;
-	contaE : out std_logic;
-	contaS : out std_logic;
-	contaTMR : out std_logic;
-    ganhou : out std_logic;
-    limpaM : out std_logic;
-    limpaR : out std_logic;
-    perdeu : out std_logic;
-    pronto : out std_logic;
-    registraM : out std_logic;
-    registraR : out std_logic;
-	zeraE : out std_logic;
-	zeraS : out std_logic;
-	zeraTMR : out std_logic;
-    db_estado : out std_logic_vector(3 downto 0)
+ENTITY unidade_controle IS
+    PORT (
+        clock : IN STD_LOGIC;
+        reset : IN STD_LOGIC;
+        iniciar : IN STD_LOGIC;
+        fim_tentativas : IN STD_LOGIC;
+        tem_jogada : IN STD_LOGIC;
+        fim_contador_letras : IN STD_LOGIC;
+        jogada_igual_senha : IN STD_LOGIC;
+        fim_rx : IN STD_LOGIC;
+        reset_timer : OUT STD_LOGIC;
+        enable_timer : OUT STD_LOGIC;
+        reset_contagem : OUT STD_LOGIC;
+        ganhou : OUT STD_LOGIC;
+        perdeu : OUT STD_LOGIC;
+        pronto : OUT STD_LOGIC;
+        incrementa_contagem_tentativas : OUT STD_LOGIC;
+        incrementa_partida : OUT STD_LOGIC;
+        db_estado : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        incrementa_contagem_registrador_letra : OUT STD_LOGIC;
+        reset_letra : OUT STD_LOGIC;
+        zera_contador_letras: out std_logic;
+        fim_timer : in std_logic;
+        tem_teste: in  std_logic;
+        segue: in std_logic --PIN_C16
+        en_letra: out std_logic
     );
-   end entity;
+END ENTITY;
 
-architecture fsm of unidade_controle is
-    type t_estado is (
-            inicial,
-            preparacao_jogo,
-            preparacao_leds,
-            led_aceso,
-            reset_leds,
-            led_apagado,
-            aumenta_endereco_led,
-            zera_endereco,
-            espera_jogada,
-            registra_jogada,
-            compara_jogada,
-            fim_perdeu,
-            fim_ganhou,
-            aumenta_endereco_jogada,
-            proxima_sequencia
-        );
-    signal Eatual, Eprox: t_estado;
-begin
+ARCHITECTURE fsm OF unidade_controle IS
+    TYPE t_estado IS (
+        espera,
+        preparacao_jogo,
+        espera_jogada,
+        incrementa_contagem_letra,
+        registra_letra,
+        limpa_palavra,
+        recebe_letra,
+        compara,
+        manda_leds,
+        incrementa_contagem_leds,
+        fim_perdeu,
+        fim_ganhou
+    );
+    SIGNAL Eatual, Eprox : t_estado;
+BEGIN
 
     -- memoria de estado
-    process (clock,reset)
-    begin
-        if reset='1' then
-            Eatual <= inicial;
-        elsif clock'event and clock = '1' then
-            Eatual <= Eprox; 
-        end if;
-    end process;
+    PROCESS (clock, reset)
+    BEGIN
+        IF reset = '1' THEN
+            Eatual <= espera;
+        ELSIF clock'event AND clock = '1' THEN
+            Eatual <= Eprox;
+        END IF;
+    END PROCESS;
 
     -- logica de proximo estado
     Eprox <=
-        inicial                 when  Eatual=inicial and iniciar='0' else
-        preparacao_jogo         when  Eatual=inicial and iniciar='1' else
-        preparacao_leds         when  Eatual=preparacao_jogo or Eatual=aumenta_endereco_led or Eatual=proxima_sequencia else
-        led_aceso               when  Eatual=preparacao_leds or (Eatual=led_aceso and fimTMR = '0') else
-        reset_leds              when  Eatual=led_aceso and fimTMR = '1' else
-        led_apagado             when  Eatual=reset_leds or (Eatual=led_apagado and fimTMR = '0') else
-        aumenta_endereco_led    when  Eatual=led_apagado and igualS='0' and fimTMR='1' else
-        zera_endereco           when  Eatual=led_apagado and igualS='1' and fimTMR='1' else
-        espera_jogada           when  Eatual=zera_endereco or (Eatual=espera_jogada and jogada = '0') or Eatual=aumenta_endereco_jogada else
-        registra_jogada         when  Eatual=espera_jogada and jogada= '1' else
-        compara_jogada          when  Eatual=registra_jogada else
-        fim_perdeu              when  (Eatual=compara_jogada and igualJ = '0') or (Eatual = fim_perdeu and iniciar = '0') else
-        fim_ganhou              when  (Eatual=compara_jogada and igualJ = '1' and fimS='1' and fimE='1') or (Eatual = fim_ganhou and iniciar = '0') else
-        aumenta_endereco_jogada when Eatual=compara_jogada and igualS = '0' else
-        proxima_sequencia       when  Eatual=compara_jogada and igualS = '1' and fimS = '0' else
-        inicial                 when  (Eatual=fim_perdeu or Eatual=fim_ganhou) and iniciar = '1' else
-        inicial;
+        espera WHEN Eatual = espera AND iniciar = '0' ELSE
+        preparacao_jogo WHEN (Eatual = espera AND iniciar = '1') ELSE
+        espera_jogada WHEN (Eatual = preparacao_jogo) OR (Eatual = limpa_palavra) or (Eatual = espera_jogada and tem_teste = '0') ELSE
+        recebe_letra WHEN (Eatual = espera_jogada AND tem_jogada = '1') OR Eatual = incrementa_contagem_letra OR (Eatual = recebe_letra AND fim_rx = '0') ELSE
+        registra_letra WHEN Eatual = recebe_letra AND fim_rx = '1' AND fim_contador_letras = '0' ELSE
+        compara WHEN Eatual= registra_letra OR Eatual= compara AND segue='0' ELSE
+        incrementa_contagem_letra WHEN Eatual = compara AND segue='1' ELSE
+        conta_palavra WHEN Eatual = recebe_letra and  
+        limpa_palavra WHEN (Eatual = recebe and fim_contador_letras = '1' and fim_tentativas = '0') ELSE
+        --compara WHEN (Eatual = recebe_letra AND fim_contador_letras = '1') or (Eatual=espera_jogada and tem_teste='1') ELSE
+        fim_perdeu WHEN (Eatual = manda_leds AND fim_contador_letras = '1' and jogada_igual_senha = '0' AND fim_tentativas = '1') ELSE
+        fim_ganhou WHEN (Eatual = manda_leds and fim_contador_letras = '1' AND jogada_igual_senha = '1') ELSE
+        espera WHEN (Eatual = fim_perdeu) OR (Eatual = fim_ganhou) ELSE
+        espera;
 
     -- logica de saída (maquina de Moore)
-    with Eatual select
-        contaE <=     '1' when aumenta_endereco_led,
-                      '1' when aumenta_endereco_jogada,
-                      '0' when others;
-    with Eatual select
-	    contaS <=     '1' when proxima_sequencia,
-                      '0' when others;
-    with Eatual select
-	    contaTMR <=   '1' when led_aceso,
-                      '1' when led_apagado,
-                      '0' when others;
-    with Eatual select
-        ganhou <=     '1' when fim_ganhou,
-                      '0' when others;
-    with Eatual select
-        limpaM <=     '1' when preparacao_jogo,
-                      '1' when reset_leds,
-                      '0' when others;
-    with Eatual select
-        limpaR <=     '1' when preparacao_jogo,
-                      '0' when others;
-    with Eatual select
-        perdeu <=     '1' when fim_perdeu,
-                      '0' when others;
-    with Eatual select
-        pronto <=     '1' when fim_perdeu,
-                      '1' when fim_ganhou,
-                      '0' when others;
-    with Eatual select
-        registraM <=  '1' when preparacao_leds,
-                      '0' when others;
-    with Eatual select
-        registraR <=  '1' when registra_jogada,
-                      '0' when others;
-    with Eatual select
-	    zeraE <=      '1' when zera_endereco,
-                      '1' when proxima_sequencia,
-                      '0' when others;
-    with Eatual select
-	    zeraS <=      '1' when preparacao_jogo,
-                      '0' when others;
-    with Eatual select
-	    zeraTMR <=    '1' when preparacao_leds,
-                      '1' when reset_leds,
-                      '0' when others;
-    with Eatual select
-        db_estado <=  "0000" when inicial,     -- 0
-                      "0001" when preparacao_jogo,  -- 1
-                      "0010" when preparacao_leds,    -- 2
-                      "0011" when led_aceso,  -- 3
-                      "0100" when reset_leds,     -- 4
-                      "0101" when led_apagado, -- 5
-                      "0110" when aumenta_endereco_led,   -- 6
-                      "0111" when zera_endereco,      -- 7
-                      "1000" when espera_jogada,     -- 8
-                      "1001" when registra_jogada,  -- 9
-                      "1010" when compara_jogada,    -- A
-                      "1011" when fim_perdeu,  -- B
-                      "1100" when fim_ganhou,     -- C
-                      "1101" when aumenta_endereco_jogada, -- D
-                      "1110" when proxima_sequencia,   -- E
-                      "1111" when others;      -- F
-end architecture;
+    ganhou <= '1' WHEN Eatual = fim_ganhou ELSE
+        '0' WHEN Eatual = preparacao_jogo;
+    perdeu <= '1' WHEN Eatual = fim_perdeu ELSE
+        '0' WHEN Eatual = preparacao_jogo;
+    pronto <= '1' WHEN Eatual = fim_perdeu ELSE
+        '1' WHEN Eatual = fim_ganhou ELSE
+        '0' WHEN Eatual = preparacao_jogo;
+
+    WITH Eatual SELECT
+        reset_timer <= '1' WHEN compara,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        enable_timer <= '1' WHEN manda_leds,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        zera_contador_letras <= '1' WHEN espera_jogada,
+        '0' WHEN OTHERS;
+
+    WITH Eatual SELECT
+        reset_letra <= '1' WHEN preparacao_jogo | incrementa_contagem_letra,
+        '1' WHEN limpa_palavra,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_contagem_registrador_letra <= '1' WHEN incrementa_contagem_letra,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_partida <= '1' WHEN preparacao_jogo,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        incrementa_contagem_tentativas <= '1' WHEN ,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        reset_contagem <= '1' WHEN preparacao_jogo,
+        '0' WHEN OTHERS;
+    WITH Eatual SELECT
+        en_letra <= '1' WHEN registra_letra,
+        '0' WHEN OTHERS; 
+    
+    
+        WITH Eatual SELECT
+        db_estado <= "0000" WHEN espera, -- 0
+        "0001" WHEN preparacao_jogo, -- 1
+        "0010" WHEN espera_jogada, -- 2
+        "0011" WHEN registra_letra, -- 3  
+        "0100" WHEN incrementa_contagem_letra, -- 4
+        "0101" WHEN limpa_palavra, -- 5
+        "0110" WHEN compara, -- 6
+        "1001" WHEN fim_perdeu, -- 9
+        "1010" WHEN fim_ganhou, -- 10
+        "1111" WHEN OTHERS; -- F
+END ARCHITECTURE;
