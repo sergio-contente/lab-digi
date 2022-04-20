@@ -45,7 +45,7 @@ ARCHITECTURE tb OF testbench_2 IS
             pronto : OUT STD_LOGIC;
             ganhou : OUT STD_LOGIC;
             perdeu : OUT STD_LOGIC;
-            teste_fudido : IN STD_LOGIC_VECTOR(39 DOWNTO 0);
+            teste_vector: IN STD_LOGIC_VECTOR(39 DOWNTO 0);
             tem_teste : in std_logic
         );
     END COMPONENT;
@@ -147,7 +147,7 @@ BEGIN
         pronto => pronto_out,
         ganhou => ganhou_out,
         perdeu => perdeu_out,
-        teste_fudido => teste_fudido_in,
+        teste_vector=> teste_fudido_in,
         tem_teste => tem_teste_in
     );
 
